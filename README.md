@@ -1,0 +1,2 @@
+# normalized_lsl_fpga
+Hardware implementation (for Xilinx FPGA) of an adaptation of the normalized lattice recursive least-squares (RLS) algorithm proposed by C. Paleologu et al. in "Low Dynamics RLSL Adaptive Algorithm Using A Priori Estimation Errors". In particular, the implemented algorithm applies Palelogu's proposal to the error feedback least-squares lattice (LSL) algorithm.
