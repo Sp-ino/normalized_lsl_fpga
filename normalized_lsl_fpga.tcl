@@ -30,6 +30,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/update_slice.vhd"]"\
  "[file normalize "$origin_dir/src/divider.vhd"]"\
  "[file normalize "$origin_dir/src/mux.vhd"]"\
+ "[file normalize "$origin_dir/src/normalize.vhd"]"\
  "[file normalize "$origin_dir/../lsl_fpga/src/tb/update_gamma_tb.vhd"]"\
  "[file normalize "$origin_dir/../lsl_fpga/src/tb/update_epsilon_tb.vhd"]"\
  "[file normalize "$origin_dir/../lsl_fpga/src/tb/update_kappa_tb.vhd"]"\
@@ -188,6 +189,7 @@ set files [list \
  [file normalize "${origin_dir}/src/update_slice.vhd"] \
  [file normalize "${origin_dir}/src/divider.vhd"] \
  [file normalize "${origin_dir}/src/mux.vhd"] \
+ [file normalize "${origin_dir}/src/normalize.vhd"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -248,6 +250,11 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "$origin_dir/src/mux.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
+set file "$origin_dir/src/normalize.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
@@ -397,6 +404,365 @@ set obj [get_filesets utils_1]
 
 
 # Adding sources referenced in BDs, if not already added
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+
+
+# Proc to create BD update_kappa
+proc cr_bd_update_kappa { parentCell } {
+# The design that will be created by this Tcl proc contains the following 
+# module references:
+# c_port_resizer, delay, mux, mux, postmul_resizer_wideinput
+
+
+
+  # CHANGE DESIGN NAME HERE
+  set design_name update_kappa
+
+  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
+
+  create_bd_design $design_name
+
+  # Add USER_COMMENTS on $design_name
+  set_property USER_COMMENTS.comment_0 "total delay: 3 (eb_m1 and ef_m1 must have a 1 sample delay with respect to the other inputs, chib and chif must a 2 sample delay wrt to other inputs)" [get_bd_designs $design_name]
+
+  set bCheckIPsPassed 1
+  ##################################################################
+  # CHECK IPs
+  ##################################################################
+  set bCheckIPs 1
+  if { $bCheckIPs == 1 } {
+     set list_check_ips "\ 
+  xilinx.com:ip:c_addsub:12.0\
+  xilinx.com:ip:dsp_macro:1.0\
+  xilinx.com:ip:div_gen:5.1\
+  xilinx.com:ip:xlslice:1.0\
+  "
+
+   set list_ips_missing ""
+   common::send_gid_msg -ssname BD::TCL -id 2011 -severity "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
+
+   foreach ip_vlnv $list_check_ips {
+      set ip_obj [get_ipdefs -all $ip_vlnv]
+      if { $ip_obj eq "" } {
+         lappend list_ips_missing $ip_vlnv
+      }
+   }
+
+   if { $list_ips_missing ne "" } {
+      catch {common::send_gid_msg -ssname BD::TCL -id 2012 -severity "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
+      set bCheckIPsPassed 0
+   }
+
+  }
+
+  ##################################################################
+  # CHECK Modules
+  ##################################################################
+  set bCheckModules 1
+  if { $bCheckModules == 1 } {
+     set list_check_mods "\ 
+  c_port_resizer\
+  delay\
+  mux\
+  mux\
+  postmul_resizer_wideinput\
+  "
+
+   set list_mods_missing ""
+   common::send_gid_msg -ssname BD::TCL -id 2020 -severity "INFO" "Checking if the following modules exist in the project's sources: $list_check_mods ."
+
+   foreach mod_vlnv $list_check_mods {
+      if { [can_resolve_reference $mod_vlnv] == 0 } {
+         lappend list_mods_missing $mod_vlnv
+      }
+   }
+
+   if { $list_mods_missing ne "" } {
+      catch {common::send_gid_msg -ssname BD::TCL -id 2021 -severity "ERROR" "The following module(s) are not found in the project: $list_mods_missing" }
+      common::send_gid_msg -ssname BD::TCL -id 2022 -severity "INFO" "Please add source files for the missing module(s) above."
+      set bCheckIPsPassed 0
+   }
+}
+
+  if { $bCheckIPsPassed != 1 } {
+    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
+    return 3
+  }
+
+  variable script_folder
+
+  if { $parentCell eq "" } {
+     set parentCell [get_bd_cells /]
+  }
+
+  # Get object for parentCell
+  set parentObj [get_bd_cells $parentCell]
+  if { $parentObj == "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
+     return
+  }
+
+  # Make sure parentObj is hier blk
+  set parentType [get_property TYPE $parentObj]
+  if { $parentType ne "hier" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
+     return
+  }
+
+  # Save current instance; Restore later
+  set oldCurInst [current_bd_instance .]
+
+  # Set parent object as current
+  current_bd_instance $parentObj
+
+
+  # Create interface ports
+
+  # Create ports
+  set Kb1_m [ create_bd_port -dir I -from 17 -to 0 Kb1_m ]
+  set Kb_m [ create_bd_port -dir O -from 17 -to 0 Kb_m ]
+  set Kf1_m [ create_bd_port -dir I -from 17 -to 0 Kf1_m ]
+  set Kf_m [ create_bd_port -dir O -from 17 -to 0 Kf_m ]
+  set beta1_m [ create_bd_port -dir I -from 17 -to 0 beta1_m ]
+  set beta_m1 [ create_bd_port -dir O -from 39 -to 0 beta_m1 ]
+  set ck [ create_bd_port -dir I ck ]
+  set eb_m1 [ create_bd_port -dir I -from 17 -to 0 eb_m1 ]
+  set ef_m1 [ create_bd_port -dir I -from 17 -to 0 ef_m1 ]
+  set geb_m1 [ create_bd_port -dir I -from 17 -to 0 geb_m1 ]
+  set gef_m [ create_bd_port -dir I -from 17 -to 0 gef_m ]
+  set sel [ create_bd_port -dir I sel ]
+  set valid [ create_bd_port -dir I valid ]
+  set xib_m1 [ create_bd_port -dir I -from 17 -to 0 xib_m1 ]
+  set xif_m [ create_bd_port -dir I -from 17 -to 0 xif_m ]
+
+  # Create instance: Kb_m, and set properties
+  set Kb_m [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 Kb_m ]
+  set_property -dict [ list \
+   CONFIG.A_Width {18} \
+   CONFIG.Add_Mode {Subtract} \
+   CONFIG.B_Value {000000000000000000} \
+   CONFIG.B_Width {18} \
+   CONFIG.CE {false} \
+   CONFIG.Latency {0} \
+   CONFIG.Out_Width {18} \
+ ] $Kb_m
+
+  # Create instance: betaef_plus_kf1, and set properties
+  set betaef_plus_kf1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 betaef_plus_kf1 ]
+  set_property -dict [ list \
+   CONFIG.areg_1 {false} \
+   CONFIG.areg_2 {false} \
+   CONFIG.areg_3 {false} \
+   CONFIG.areg_4 {true} \
+   CONFIG.breg_1 {false} \
+   CONFIG.breg_2 {false} \
+   CONFIG.breg_3 {false} \
+   CONFIG.breg_4 {false} \
+   CONFIG.c_binarywidth {0} \
+   CONFIG.c_width {36} \
+   CONFIG.creg_1 {false} \
+   CONFIG.creg_2 {false} \
+   CONFIG.creg_3 {false} \
+   CONFIG.creg_4 {true} \
+   CONFIG.creg_5 {true} \
+   CONFIG.instruction1 {A*B+C} \
+   CONFIG.mreg_5 {true} \
+   CONFIG.output_properties {Full_Precision} \
+   CONFIG.p_binarywidth {0} \
+   CONFIG.p_full_width {37} \
+   CONFIG.p_width {37} \
+   CONFIG.pipeline_options {Expert} \
+   CONFIG.preg_6 {true} \
+   CONFIG.tier_1 {false} \
+   CONFIG.tier_2 {false} \
+   CONFIG.tier_3 {false} \
+   CONFIG.tier_4 {false} \
+   CONFIG.tier_5 {false} \
+   CONFIG.tier_6 {false} \
+ ] $betaef_plus_kf1
+
+  # Create instance: c_port_resizer_0, and set properties
+  set block_name c_port_resizer
+  set block_cell_name c_port_resizer_0
+  if { [catch {set c_port_resizer_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $c_port_resizer_0 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create instance: delay_0, and set properties
+  set block_name delay
+  set block_cell_name delay_0
+  if { [catch {set delay_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $delay_0 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create instance: gef_over_xif_or_beta_m1, and set properties
+  set gef_over_xif_or_beta_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:div_gen:5.1 gef_over_xif_or_beta_m1 ]
+  set_property -dict [ list \
+   CONFIG.algorithm_type {High_Radix} \
+   CONFIG.dividend_and_quotient_width {18} \
+   CONFIG.divisor_width {18} \
+   CONFIG.fractional_width {15} \
+   CONFIG.latency {4} \
+   CONFIG.latency_configuration {Manual} \
+   CONFIG.remainder_type {Fractional} \
+ ] $gef_over_xif_or_beta_m1
+
+  # Create instance: gefxifeb, and set properties
+  set gefxifeb [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 gefxifeb ]
+  set_property -dict [ list \
+   CONFIG.areg_1 {true} \
+   CONFIG.areg_2 {true} \
+   CONFIG.areg_3 {true} \
+   CONFIG.areg_4 {true} \
+   CONFIG.breg_3 {false} \
+   CONFIG.breg_4 {false} \
+   CONFIG.creg_3 {false} \
+   CONFIG.creg_4 {false} \
+   CONFIG.creg_5 {false} \
+   CONFIG.instruction1 {A*B} \
+   CONFIG.mreg_5 {true} \
+   CONFIG.output_properties {Full_Precision} \
+   CONFIG.p_binarywidth {0} \
+   CONFIG.p_full_width {36} \
+   CONFIG.p_width {36} \
+   CONFIG.pipeline_options {Expert} \
+   CONFIG.preg_6 {false} \
+ ] $gefxifeb
+
+  # Create instance: mux_0, and set properties
+  set block_name mux
+  set block_cell_name mux_0
+  if { [catch {set mux_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $mux_0 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create instance: mux_1, and set properties
+  set block_name mux
+  set block_cell_name mux_1
+  if { [catch {set mux_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $mux_1 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create instance: normalize, and set properties
+  set normalize [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice:1.0 normalize ]
+  set_property -dict [ list \
+   CONFIG.DIN_FROM {35} \
+   CONFIG.DIN_TO {20} \
+   CONFIG.DIN_WIDTH {36} \
+   CONFIG.DOUT_WIDTH {16} \
+ ] $normalize
+
+  # Create instance: postmul_resizer_wide_0, and set properties
+  set block_name postmul_resizer_wideinput
+  set block_cell_name postmul_resizer_wide_0
+  if { [catch {set postmul_resizer_wide_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $postmul_resizer_wide_0 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create port connections
+  connect_bd_net -net Kb1_m_1 [get_bd_ports Kb1_m] [get_bd_pins delay_0/i_data]
+  connect_bd_net -net Kf1_m_1 [get_bd_ports Kf1_m] [get_bd_pins c_port_resizer_0/i_data]
+  connect_bd_net -net beta1_m_1 [get_bd_ports beta1_m] [get_bd_pins betaef_plus_kf1/B]
+  connect_bd_net -net betaef_plus_kf1_P [get_bd_pins betaef_plus_kf1/P] [get_bd_pins postmul_resizer_wide_0/i_data]
+  connect_bd_net -net c_addsub_0_S [get_bd_ports Kb_m] [get_bd_pins Kb_m/S]
+  connect_bd_net -net c_port_resizer_0_o_data [get_bd_pins betaef_plus_kf1/C] [get_bd_pins c_port_resizer_0/o_data]
+  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins betaef_plus_kf1/CLK] [get_bd_pins delay_0/i_ck] [get_bd_pins gef_over_xif_or_beta_m1/aclk] [get_bd_pins gefxifeb/CLK]
+  connect_bd_net -net delay_0_o_data [get_bd_pins Kb_m/A] [get_bd_pins delay_0/o_data]
+  connect_bd_net -net eb_m1_1 [get_bd_ports eb_m1] [get_bd_pins gefxifeb/A]
+  connect_bd_net -net ef_m1_1 [get_bd_ports ef_m1] [get_bd_pins betaef_plus_kf1/A]
+  connect_bd_net -net geb_m1_1 [get_bd_ports geb_m1] [get_bd_pins mux_1/d1]
+  connect_bd_net -net gef_m_1 [get_bd_ports gef_m] [get_bd_pins mux_1/d0]
+  connect_bd_net -net gef_over_xif_or_beta_m1_m_axis_dout_tdata [get_bd_ports beta_m1] [get_bd_pins gef_over_xif_or_beta_m1/m_axis_dout_tdata] [get_bd_pins gefxifeb/B]
+  connect_bd_net -net gfb_P [get_bd_pins gefxifeb/P] [get_bd_pins normalize/Din]
+  connect_bd_net -net mux_0_s [get_bd_pins gef_over_xif_or_beta_m1/s_axis_divisor_tdata] [get_bd_pins mux_0/s]
+  connect_bd_net -net mux_1_s [get_bd_pins gef_over_xif_or_beta_m1/s_axis_dividend_tdata] [get_bd_pins mux_1/s]
+  connect_bd_net -net postmul_resizer_wide_0_o_data [get_bd_ports Kf_m] [get_bd_pins postmul_resizer_wide_0/o_data]
+  connect_bd_net -net sel_1 [get_bd_ports sel] [get_bd_pins mux_0/sel] [get_bd_pins mux_1/sel]
+  connect_bd_net -net valid_1 [get_bd_ports valid] [get_bd_pins gef_over_xif_or_beta_m1/s_axis_dividend_tvalid] [get_bd_pins gef_over_xif_or_beta_m1/s_axis_divisor_tvalid]
+  connect_bd_net -net xib_m1_1 [get_bd_ports xib_m1] [get_bd_pins mux_0/d1]
+  connect_bd_net -net xif_m_1 [get_bd_ports xif_m] [get_bd_pins mux_0/d0]
+  connect_bd_net -net xlslice_0_Dout [get_bd_pins Kb_m/B] [get_bd_pins normalize/Dout]
+
+  # Create address segments
+
+
+  # Restore current instance
+  current_bd_instance $oldCurInst
+
+  save_bd_design
+common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
+
+  close_bd_design $design_name 
+}
+# End of cr_bd_update_kappa()
+cr_bd_update_kappa ""
+set_property REGISTERED_WITH_MANAGER "1" [get_files update_kappa.bd ] 
+set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_kappa.bd ] 
+
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
@@ -679,433 +1045,6 @@ proc cr_bd_update_epsilon { parentCell } {
 cr_bd_update_epsilon ""
 set_property REGISTERED_WITH_MANAGER "1" [get_files update_epsilon.bd ] 
 set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_epsilon.bd ] 
-
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files scalar_delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/scalar_delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files scalar_delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/scalar_delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files scalar_delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/scalar_delay.vhd"
-}
-
-
-# Proc to create BD update_chi
-proc cr_bd_update_chi { parentCell } {
-# The design that will be created by this Tcl proc contains the following 
-# module references:
-# delay, delay, postmul_resizer, postmul_resizer, postmul_resizer, scalar_delay, scalar_delay
-
-
-
-  # CHANGE DESIGN NAME HERE
-  set design_name update_chi
-
-  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
-
-  create_bd_design $design_name
-
-  # Add USER_COMMENTS on $design_name
-  set_property USER_COMMENTS.comment_0 "total delay: 4 (there are two extra cycles to compute chib and chif but they are part of the subsequent iteration)" [get_bd_designs $design_name]
-
-  set bCheckIPsPassed 1
-  ##################################################################
-  # CHECK IPs
-  ##################################################################
-  set bCheckIPs 1
-  if { $bCheckIPs == 1 } {
-     set list_check_ips "\ 
-  xilinx.com:ip:dsp_macro:1.0\
-  xilinx.com:ip:c_addsub:12.0\
-  xilinx.com:ip:div_gen:5.1\
-  xilinx.com:ip:xlconstant:1.1\
-  "
-
-   set list_ips_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2011 -severity "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
-
-   foreach ip_vlnv $list_check_ips {
-      set ip_obj [get_ipdefs -all $ip_vlnv]
-      if { $ip_obj eq "" } {
-         lappend list_ips_missing $ip_vlnv
-      }
-   }
-
-   if { $list_ips_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2012 -severity "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
-      set bCheckIPsPassed 0
-   }
-
-  }
-
-  ##################################################################
-  # CHECK Modules
-  ##################################################################
-  set bCheckModules 1
-  if { $bCheckModules == 1 } {
-     set list_check_mods "\ 
-  delay\
-  delay\
-  postmul_resizer\
-  postmul_resizer\
-  postmul_resizer\
-  scalar_delay\
-  scalar_delay\
-  "
-
-   set list_mods_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2020 -severity "INFO" "Checking if the following modules exist in the project's sources: $list_check_mods ."
-
-   foreach mod_vlnv $list_check_mods {
-      if { [can_resolve_reference $mod_vlnv] == 0 } {
-         lappend list_mods_missing $mod_vlnv
-      }
-   }
-
-   if { $list_mods_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2021 -severity "ERROR" "The following module(s) are not found in the project: $list_mods_missing" }
-      common::send_gid_msg -ssname BD::TCL -id 2022 -severity "INFO" "Please add source files for the missing module(s) above."
-      set bCheckIPsPassed 0
-   }
-}
-
-  if { $bCheckIPsPassed != 1 } {
-    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
-    return 3
-  }
-
-  variable script_folder
-
-  if { $parentCell eq "" } {
-     set parentCell [get_bd_cells /]
-  }
-
-  # Get object for parentCell
-  set parentObj [get_bd_cells $parentCell]
-  if { $parentObj == "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
-     return
-  }
-
-  # Make sure parentObj is hier blk
-  set parentType [get_property TYPE $parentObj]
-  if { $parentType ne "hier" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
-     return
-  }
-
-  # Save current instance; Restore later
-  set oldCurInst [current_bd_instance .]
-
-  # Set parent object as current
-  current_bd_instance $parentObj
-
-
-  # Create interface ports
-
-  # Create ports
-  set Kb_m [ create_bd_port -dir I -from 17 -to 0 Kb_m ]
-  set Kf_m [ create_bd_port -dir I -from 17 -to 0 Kf_m ]
-  set chib_m [ create_bd_port -dir I -from 17 -to 0 chib_m ]
-  set chib_m1 [ create_bd_port -dir O -from 17 -to 0 chib_m1 ]
-  set chif_m [ create_bd_port -dir I -from 17 -to 0 chif_m ]
-  set chif_m1 [ create_bd_port -dir O -from 17 -to 0 chif_m1 ]
-  set ck [ create_bd_port -dir I ck ]
-  set datain_valid [ create_bd_port -dir I datain_valid ]
-  set dataout_valid [ create_bd_port -dir O dataout_valid ]
-  set dividend_ready [ create_bd_port -dir O dividend_ready ]
-  set divisor_ready [ create_bd_port -dir O divisor_ready ]
-
-  # Create instance: chib_m1, and set properties
-  set chib_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 chib_m1 ]
-  set_property -dict [ list \
-   CONFIG.a_binarywidth {0} \
-   CONFIG.a_width {18} \
-   CONFIG.areg_1 {true} \
-   CONFIG.areg_2 {true} \
-   CONFIG.areg_3 {true} \
-   CONFIG.areg_4 {true} \
-   CONFIG.b_binarywidth {0} \
-   CONFIG.b_width {18} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {48} \
-   CONFIG.concat_binarywidth {0} \
-   CONFIG.concat_width {48} \
-   CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {false} \
-   CONFIG.creg_5 {false} \
-   CONFIG.d_width {18} \
-   CONFIG.instruction1 {A*B} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.output_properties {Full_Precision} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {36} \
-   CONFIG.p_width {36} \
-   CONFIG.pcin_binarywidth {0} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {false} \
- ] $chib_m1
-
-  # Create instance: chif_m1, and set properties
-  set chif_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 chif_m1 ]
-  set_property -dict [ list \
-   CONFIG.a_binarywidth {0} \
-   CONFIG.a_width {18} \
-   CONFIG.areg_1 {true} \
-   CONFIG.areg_2 {true} \
-   CONFIG.areg_3 {true} \
-   CONFIG.areg_4 {true} \
-   CONFIG.b_binarywidth {0} \
-   CONFIG.b_width {18} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {48} \
-   CONFIG.concat_binarywidth {0} \
-   CONFIG.concat_width {48} \
-   CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {false} \
-   CONFIG.creg_5 {false} \
-   CONFIG.d_width {18} \
-   CONFIG.instruction1 {A*B} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.output_properties {Full_Precision} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {36} \
-   CONFIG.p_width {36} \
-   CONFIG.pcin_binarywidth {0} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {false} \
- ] $chif_m1
-
-  # Create instance: delay_0, and set properties
-  set block_name delay
-  set block_cell_name delay_0
-  if { [catch {set delay_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $delay_0
-
-  # Create instance: delay_1, and set properties
-  set block_name delay
-  set block_cell_name delay_1
-  if { [catch {set delay_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_1 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $delay_1
-
-  # Create instance: denom, and set properties
-  set denom [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 denom ]
-  set_property -dict [ list \
-   CONFIG.A_Width {18} \
-   CONFIG.Add_Mode {Add} \
-   CONFIG.B_Constant {true} \
-   CONFIG.B_Value {001000000000000000} \
-   CONFIG.B_Width {18} \
-   CONFIG.CE {false} \
-   CONFIG.Latency {0} \
-   CONFIG.Latency_Configuration {Manual} \
-   CONFIG.Out_Width {18} \
- ] $denom
-
-  # Create instance: minus_kbkf, and set properties
-  set minus_kbkf [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 minus_kbkf ]
-  set_property -dict [ list \
-   CONFIG.areg_3 {false} \
-   CONFIG.areg_4 {false} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {false} \
-   CONFIG.creg_5 {false} \
-   CONFIG.instruction1 {-A*B} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.output_properties {Full_Precision} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {36} \
-   CONFIG.p_width {36} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {false} \
- ] $minus_kbkf
-
-  # Create instance: one_over_denom, and set properties
-  set one_over_denom [ create_bd_cell -type ip -vlnv xilinx.com:ip:div_gen:5.1 one_over_denom ]
-  set_property -dict [ list \
-   CONFIG.algorithm_type {High_Radix} \
-   CONFIG.dividend_and_quotient_width {18} \
-   CONFIG.divisor_width {18} \
-   CONFIG.fractional_width {15} \
-   CONFIG.latency {4} \
-   CONFIG.latency_configuration {Manual} \
-   CONFIG.remainder_type {Fractional} \
- ] $one_over_denom
-
-  # Create instance: postmul_resizer_1, and set properties
-  set block_name postmul_resizer
-  set block_cell_name postmul_resizer_1
-  if { [catch {set postmul_resizer_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $postmul_resizer_1 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: postmul_resizer_2, and set properties
-  set block_name postmul_resizer
-  set block_cell_name postmul_resizer_2
-  if { [catch {set postmul_resizer_2 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $postmul_resizer_2 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: postmul_resizer_3, and set properties
-  set block_name postmul_resizer
-  set block_cell_name postmul_resizer_3
-  if { [catch {set postmul_resizer_3 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $postmul_resizer_3 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: scalar_delay_0, and set properties
-  set block_name scalar_delay
-  set block_cell_name scalar_delay_0
-  if { [catch {set scalar_delay_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $scalar_delay_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $scalar_delay_0
-
-  # Create instance: scalar_delay_1, and set properties
-  set block_name scalar_delay
-  set block_cell_name scalar_delay_1
-  if { [catch {set scalar_delay_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $scalar_delay_1 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $scalar_delay_1
-
-  # Create instance: xlconstant_0, and set properties
-  set xlconstant_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 xlconstant_0 ]
-  set_property -dict [ list \
-   CONFIG.CONST_VAL {32768} \
-   CONFIG.CONST_WIDTH {18} \
- ] $xlconstant_0
-
-  # Create port connections
-  connect_bd_net -net Kb1_m_1 [get_bd_ports Kb_m] [get_bd_pins minus_kbkf/B]
-  connect_bd_net -net Kf_m_1 [get_bd_ports Kf_m] [get_bd_pins minus_kbkf/A]
-  connect_bd_net -net Kf_m_S [get_bd_pins denom/S] [get_bd_pins one_over_denom/s_axis_divisor_tdata]
-  connect_bd_net -net chib_m1_P [get_bd_pins chib_m1/P] [get_bd_pins postmul_resizer_2/i_data]
-  connect_bd_net -net chib_m_1 [get_bd_ports chib_m] [get_bd_pins delay_1/i_data]
-  connect_bd_net -net chif_m1_P [get_bd_pins chif_m1/P] [get_bd_pins postmul_resizer_3/i_data]
-  connect_bd_net -net chif_m_1 [get_bd_ports chif_m] [get_bd_pins delay_0/i_data]
-  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins chib_m1/CLK] [get_bd_pins chif_m1/CLK] [get_bd_pins delay_0/i_ck] [get_bd_pins delay_1/i_ck] [get_bd_pins minus_kbkf/CLK] [get_bd_pins one_over_denom/aclk] [get_bd_pins scalar_delay_0/i_ck] [get_bd_pins scalar_delay_1/i_ck]
-  connect_bd_net -net datain_valid_1 [get_bd_pins one_over_denom/s_axis_dividend_tvalid] [get_bd_pins one_over_denom/s_axis_divisor_tvalid] [get_bd_pins scalar_delay_0/o_data]
-  connect_bd_net -net datain_valid_2 [get_bd_ports datain_valid] [get_bd_pins scalar_delay_0/i_data]
-  connect_bd_net -net delay_0_o_data [get_bd_pins chif_m1/A] [get_bd_pins delay_0/o_data]
-  connect_bd_net -net delay_1_o_data [get_bd_pins chib_m1/A] [get_bd_pins delay_1/o_data]
-  connect_bd_net -net minus_kbkf_P [get_bd_pins minus_kbkf/P] [get_bd_pins postmul_resizer_1/i_data]
-  connect_bd_net -net one_over_denom_m_axis_dout_tdata [get_bd_pins chib_m1/B] [get_bd_pins chif_m1/B] [get_bd_pins one_over_denom/m_axis_dout_tdata]
-  connect_bd_net -net one_over_denom_m_axis_dout_tvalid [get_bd_pins one_over_denom/m_axis_dout_tvalid] [get_bd_pins scalar_delay_1/i_data]
-  connect_bd_net -net one_over_denom_s_axis_dividend_tready [get_bd_ports dividend_ready] [get_bd_pins one_over_denom/s_axis_dividend_tready]
-  connect_bd_net -net one_over_denom_s_axis_divisor_tready [get_bd_ports divisor_ready] [get_bd_pins one_over_denom/s_axis_divisor_tready]
-  connect_bd_net -net postmul_resizer_1_o_data [get_bd_pins denom/A] [get_bd_pins postmul_resizer_1/o_data]
-  connect_bd_net -net postmul_resizer_2_o_data [get_bd_ports chib_m1] [get_bd_pins postmul_resizer_2/o_data]
-  connect_bd_net -net postmul_resizer_3_o_data [get_bd_ports chif_m1] [get_bd_pins postmul_resizer_3/o_data]
-  connect_bd_net -net scalar_delay_1_o_data [get_bd_ports dataout_valid] [get_bd_pins scalar_delay_1/o_data]
-  connect_bd_net -net xlconstant_0_dout [get_bd_pins one_over_denom/s_axis_dividend_tdata] [get_bd_pins xlconstant_0/dout]
-
-  # Create address segments
-
-
-  # Restore current instance
-  current_bd_instance $oldCurInst
-
-  validate_bd_design
-  save_bd_design
-  close_bd_design $design_name 
-}
-# End of cr_bd_update_chi()
-cr_bd_update_chi ""
-set_property REGISTERED_WITH_MANAGER "1" [get_files update_chi.bd ] 
-set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_chi.bd ] 
 
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
@@ -1721,344 +1660,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_gamma.bd ]
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-
-
-# Proc to create BD update_kappa
-proc cr_bd_update_kappa { parentCell } {
-# The design that will be created by this Tcl proc contains the following 
-# module references:
-# c_port_resizer, c_port_resizer, postmul_resizer, postmul_resizer_wideinput, postmul_resizer_wideinput
-
-
-
-  # CHANGE DESIGN NAME HERE
-  set design_name update_kappa
-
-  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
-
-  create_bd_design $design_name
-
-  # Add USER_COMMENTS on $design_name
-  set_property USER_COMMENTS.comment_0 "total delay: 3 (eb_m1 and ef_m1 must have a 1 sample delay with respect to the other inputs, chib and chif must a 2 sample delay wrt to other inputs)" [get_bd_designs $design_name]
-
-  set bCheckIPsPassed 1
-  ##################################################################
-  # CHECK IPs
-  ##################################################################
-  set bCheckIPs 1
-  if { $bCheckIPs == 1 } {
-     set list_check_ips "\ 
-  xilinx.com:ip:dsp_macro:1.0\
-  xilinx.com:ip:div_gen:5.1\
-  "
-
-   set list_ips_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2011 -severity "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
-
-   foreach ip_vlnv $list_check_ips {
-      set ip_obj [get_ipdefs -all $ip_vlnv]
-      if { $ip_obj eq "" } {
-         lappend list_ips_missing $ip_vlnv
-      }
-   }
-
-   if { $list_ips_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2012 -severity "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
-      set bCheckIPsPassed 0
-   }
-
-  }
-
-  ##################################################################
-  # CHECK Modules
-  ##################################################################
-  set bCheckModules 1
-  if { $bCheckModules == 1 } {
-     set list_check_mods "\ 
-  c_port_resizer\
-  c_port_resizer\
-  postmul_resizer\
-  postmul_resizer_wideinput\
-  postmul_resizer_wideinput\
-  "
-
-   set list_mods_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2020 -severity "INFO" "Checking if the following modules exist in the project's sources: $list_check_mods ."
-
-   foreach mod_vlnv $list_check_mods {
-      if { [can_resolve_reference $mod_vlnv] == 0 } {
-         lappend list_mods_missing $mod_vlnv
-      }
-   }
-
-   if { $list_mods_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2021 -severity "ERROR" "The following module(s) are not found in the project: $list_mods_missing" }
-      common::send_gid_msg -ssname BD::TCL -id 2022 -severity "INFO" "Please add source files for the missing module(s) above."
-      set bCheckIPsPassed 0
-   }
-}
-
-  if { $bCheckIPsPassed != 1 } {
-    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
-    return 3
-  }
-
-  variable script_folder
-
-  if { $parentCell eq "" } {
-     set parentCell [get_bd_cells /]
-  }
-
-  # Get object for parentCell
-  set parentObj [get_bd_cells $parentCell]
-  if { $parentObj == "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
-     return
-  }
-
-  # Make sure parentObj is hier blk
-  set parentType [get_property TYPE $parentObj]
-  if { $parentType ne "hier" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
-     return
-  }
-
-  # Save current instance; Restore later
-  set oldCurInst [current_bd_instance .]
-
-  # Set parent object as current
-  current_bd_instance $parentObj
-
-
-  # Create interface ports
-
-  # Create ports
-  set Kb1_m [ create_bd_port -dir I -from 17 -to 0 Kb1_m ]
-  set Kb_m [ create_bd_port -dir O -from 17 -to 0 Kb_m ]
-  set Kf1_m [ create_bd_port -dir I -from 17 -to 0 Kf1_m ]
-  set Kf_m [ create_bd_port -dir O -from 17 -to 0 Kf_m ]
-  set beta1_m [ create_bd_port -dir I -from 17 -to 0 beta1_m ]
-  set ck [ create_bd_port -dir I ck ]
-  set eb_m1 [ create_bd_port -dir I -from 17 -to 0 eb_m1 ]
-  set ef_m1 [ create_bd_port -dir I -from 17 -to 0 ef_m1 ]
-  set gef_m [ create_bd_port -dir I -from 17 -to 0 gef_m ]
-  set xif_m [ create_bd_port -dir I -from 17 -to 0 xif_m ]
-
-  # Create instance: betaef_plus_kf1, and set properties
-  set betaef_plus_kf1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 betaef_plus_kf1 ]
-  set_property -dict [ list \
-   CONFIG.areg_1 {false} \
-   CONFIG.areg_2 {false} \
-   CONFIG.areg_3 {false} \
-   CONFIG.areg_4 {true} \
-   CONFIG.breg_1 {false} \
-   CONFIG.breg_2 {false} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {36} \
-   CONFIG.creg_1 {false} \
-   CONFIG.creg_2 {false} \
-   CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {true} \
-   CONFIG.creg_5 {true} \
-   CONFIG.instruction1 {A*B+C} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.output_properties {Full_Precision} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {37} \
-   CONFIG.p_width {37} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {true} \
-   CONFIG.tier_1 {false} \
-   CONFIG.tier_2 {false} \
-   CONFIG.tier_3 {false} \
-   CONFIG.tier_4 {false} \
-   CONFIG.tier_5 {false} \
-   CONFIG.tier_6 {false} \
- ] $betaef_plus_kf1
-
-  # Create instance: c_port_resizer_0, and set properties
-  set block_name c_port_resizer
-  set block_cell_name c_port_resizer_0
-  if { [catch {set c_port_resizer_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $c_port_resizer_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: c_port_resizer_1, and set properties
-  set block_name c_port_resizer
-  set block_cell_name c_port_resizer_1
-  if { [catch {set c_port_resizer_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $c_port_resizer_1 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: gchif_plus_kb1, and set properties
-  set gchif_plus_kb1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 gchif_plus_kb1 ]
-  set_property -dict [ list \
-   CONFIG.areg_1 {false} \
-   CONFIG.areg_2 {false} \
-   CONFIG.areg_3 {false} \
-   CONFIG.areg_4 {false} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {36} \
-   CONFIG.creg_1 {false} \
-   CONFIG.creg_2 {false} \
-   CONFIG.creg_3 {true} \
-   CONFIG.creg_4 {true} \
-   CONFIG.creg_5 {true} \
-   CONFIG.instruction1 {A*B+C} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.output_properties {Full_Precision} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {37} \
-   CONFIG.p_width {37} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {false} \
- ] $gchif_plus_kb1
-
-  # Create instance: gef_over_xif_or_beta_m1, and set properties
-  set gef_over_xif_or_beta_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:div_gen:5.1 gef_over_xif_or_beta_m1 ]
-  set_property -dict [ list \
-   CONFIG.algorithm_type {High_Radix} \
-   CONFIG.dividend_and_quotient_width {18} \
-   CONFIG.divisor_width {18} \
-   CONFIG.fractional_width {15} \
-   CONFIG.latency {4} \
-   CONFIG.latency_configuration {Manual} \
-   CONFIG.remainder_type {Fractional} \
- ] $gef_over_xif_or_beta_m1
-
-  # Create instance: gfb, and set properties
-  set gfb [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 gfb ]
-  set_property -dict [ list \
-   CONFIG.areg_3 {false} \
-   CONFIG.areg_4 {false} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {false} \
-   CONFIG.creg_5 {false} \
-   CONFIG.instruction1 {A*B} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.output_properties {Full_Precision} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {36} \
-   CONFIG.p_width {36} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {false} \
- ] $gfb
-
-  # Create instance: postmul_resizer_1, and set properties
-  set block_name postmul_resizer
-  set block_cell_name postmul_resizer_1
-  if { [catch {set postmul_resizer_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $postmul_resizer_1 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: postmul_resizer_wide_0, and set properties
-  set block_name postmul_resizer_wideinput
-  set block_cell_name postmul_resizer_wide_0
-  if { [catch {set postmul_resizer_wide_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $postmul_resizer_wide_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create instance: postmul_resizer_wide_1, and set properties
-  set block_name postmul_resizer_wideinput
-  set block_cell_name postmul_resizer_wide_1
-  if { [catch {set postmul_resizer_wide_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $postmul_resizer_wide_1 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
-  # Create port connections
-  connect_bd_net -net Kf1_m_1 [get_bd_ports Kf1_m] [get_bd_pins c_port_resizer_0/i_data]
-  connect_bd_net -net beta1_m_1 [get_bd_ports beta1_m] [get_bd_pins betaef_plus_kf1/B]
-  connect_bd_net -net betaef_plus_kf1_P [get_bd_pins betaef_plus_kf1/P] [get_bd_pins postmul_resizer_wide_0/i_data]
-  connect_bd_net -net c_port_resizer_0_o_data [get_bd_pins betaef_plus_kf1/C] [get_bd_pins c_port_resizer_0/o_data]
-  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins betaef_plus_kf1/CLK] [get_bd_pins gchif_plus_kb1/CLK] [get_bd_pins gfb/CLK]
-  connect_bd_net -net ef_m1_1 [get_bd_ports ef_m1] [get_bd_pins betaef_plus_kf1/A]
-  connect_bd_net -net postmul_resizer_wide_0_o_data [get_bd_ports Kf_m] [get_bd_pins postmul_resizer_wide_0/o_data]
-  connect_bd_net -net postmul_resizer_wide_1_o_data [get_bd_ports Kb_m] [get_bd_pins postmul_resizer_wide_1/o_data]
-
-  # Create address segments
-
-
-  # Restore current instance
-  current_bd_instance $oldCurInst
-
-  save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
-  close_bd_design $design_name 
-}
-# End of cr_bd_update_kappa()
-cr_bd_update_kappa ""
-set_property REGISTERED_WITH_MANAGER "1" [get_files update_kappa.bd ] 
-set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_kappa.bd ] 
-
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
 if { [get_files delay.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
 }
@@ -2163,7 +1764,7 @@ proc cr_bd_update_block { parentCell } {
 
 # The design that will be created by this Tcl proc contains the following 
 # block design container source references:
-# update_chi, update_epsilon, update_feedforward, update_gamma, update_kappa
+# update_epsilon, update_feedforward, update_gamma, update_kappa
 
 
 
@@ -2173,6 +1774,9 @@ proc cr_bd_update_block { parentCell } {
   common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
 
   create_bd_design $design_name
+
+  # Add USER_COMMENTS on $design_name
+  set_property USER_COMMENTS.comment_0 "total delay: 4" [get_bd_designs $design_name]
 
   set bCheckIPsPassed 1
   ##################################################################
@@ -2219,7 +1823,7 @@ proc cr_bd_update_block { parentCell } {
   # CHECK Block Design Container Sources
   ##################################################################
   set bCheckSources 1
-  set list_bdc_active "update_chi, update_epsilon, update_feedforward, update_gamma, update_kappa"
+  set list_bdc_active "update_epsilon, update_feedforward, update_gamma, update_kappa"
 
   array set map_bdc_missing {}
   set map_bdc_missing(ACTIVE) ""
@@ -2227,7 +1831,6 @@ proc cr_bd_update_block { parentCell } {
 
   if { $bCheckSources == 1 } {
      set list_check_srcs "\ 
-  update_chi \
   update_epsilon \
   update_feedforward \
   update_gamma \
@@ -2547,18 +2150,6 @@ proc cr_bd_update_block { parentCell } {
    CONFIG.delay_len {3} \
  ] $scalar_delay_0
 
-  # Create instance: update_chi_del6, and set properties
-  set update_chi_del6 [ create_bd_cell -type container -reference update_chi update_chi_del6 ]
-  set_property USER_COMMENTS.comment_0 "total delay: 4" [get_bd_cells /update_chi_del6]
-  set_property -dict [ list \
-   CONFIG.ACTIVE_SIM_BD {update_chi.bd} \
-   CONFIG.ACTIVE_SYNTH_BD {update_chi.bd} \
-   CONFIG.ENABLE_DFX {0} \
-   CONFIG.LIST_SIM_BD {update_chi.bd} \
-   CONFIG.LIST_SYNTH_BD {update_chi.bd} \
-   CONFIG.LOCK_PROPAGATE {0} \
- ] $update_chi_del6
-
   # Create instance: update_epsilon_del1, and set properties
   set update_epsilon_del1 [ create_bd_cell -type container -reference update_epsilon update_epsilon_del1 ]
   set_property USER_COMMENTS.comment_1 "total delay: 1" [get_bd_cells /update_epsilon_del1]
@@ -2614,16 +2205,15 @@ proc cr_bd_update_block { parentCell } {
 
   # Create port connections
   connect_bd_net -net Kb1_m_1 [get_bd_ports Kb1_m] [get_bd_pins update_epsilon_del1/Kb1_m] [get_bd_pins update_kappa_del3/Kb1_m]
-  connect_bd_net -net Kb_m_1 [get_bd_pins delay_10/i_data] [get_bd_pins update_chi_del6/Kb_m] [get_bd_pins update_kappa_del3/Kb_m]
+  connect_bd_net -net Kb_m_1 [get_bd_pins delay_10/i_data] [get_bd_pins update_kappa_del3/Kb_m]
   connect_bd_net -net Kf1_m_2 [get_bd_ports Kf1_m] [get_bd_pins update_epsilon_del1/Kf1_m] [get_bd_pins update_kappa_del3/Kf1_m]
-  connect_bd_net -net Kf_m_1 [get_bd_pins delay_11/i_data] [get_bd_pins update_chi_del6/Kf_m] [get_bd_pins update_kappa_del3/Kf_m]
+  connect_bd_net -net Kf_m_1 [get_bd_pins delay_11/i_data] [get_bd_pins update_kappa_del3/Kf_m]
   connect_bd_net -net beta1_m_1 [get_bd_ports beta1_m] [get_bd_pins update_kappa_del3/beta1_m]
   connect_bd_net -net beta_m_1 [get_bd_pins delay_21/i_data] [get_bd_pins update_feedforward_del3/beta_m] [get_bd_pins update_gamma_del3/beta_m]
   connect_bd_net -net chib1_m_1 [get_bd_ports chib1_m] [get_bd_pins delay_7/i_data]
   connect_bd_net -net chib_m_1 [get_bd_ports chib_m] [get_bd_pins update_gamma_del3/chib_m]
-  connect_bd_net -net chib_m_2 [get_bd_pins delay_7/o_data] [get_bd_pins update_chi_del6/chib_m]
   connect_bd_net -net chif_m_2 [get_bd_ports chif_m] [get_bd_pins delay_5/i_data] [get_bd_pins update_kappa_del3/chif_m]
-  connect_bd_net -net ck_2 [get_bd_ports ck] [get_bd_pins delay_10/i_ck] [get_bd_pins delay_11/i_ck] [get_bd_pins delay_12/i_ck] [get_bd_pins delay_13/i_ck] [get_bd_pins delay_14/i_ck] [get_bd_pins delay_15/i_ck] [get_bd_pins delay_16/i_ck] [get_bd_pins delay_17/i_ck] [get_bd_pins delay_18/i_ck] [get_bd_pins delay_19/i_ck] [get_bd_pins delay_21/i_ck] [get_bd_pins delay_22/i_ck] [get_bd_pins delay_23/i_ck] [get_bd_pins delay_5/i_ck] [get_bd_pins delay_7/i_ck] [get_bd_pins scalar_delay_0/i_ck] [get_bd_pins update_chi_del6/ck] [get_bd_pins update_epsilon_del1/ck] [get_bd_pins update_feedforward_del3/ck] [get_bd_pins update_gamma_del3/ck] [get_bd_pins update_kappa_del3/ck]
+  connect_bd_net -net ck_2 [get_bd_ports ck] [get_bd_pins delay_10/i_ck] [get_bd_pins delay_11/i_ck] [get_bd_pins delay_12/i_ck] [get_bd_pins delay_13/i_ck] [get_bd_pins delay_14/i_ck] [get_bd_pins delay_15/i_ck] [get_bd_pins delay_16/i_ck] [get_bd_pins delay_17/i_ck] [get_bd_pins delay_18/i_ck] [get_bd_pins delay_19/i_ck] [get_bd_pins delay_21/i_ck] [get_bd_pins delay_22/i_ck] [get_bd_pins delay_23/i_ck] [get_bd_pins delay_5/i_ck] [get_bd_pins delay_7/i_ck] [get_bd_pins scalar_delay_0/i_ck] [get_bd_pins update_epsilon_del1/ck] [get_bd_pins update_feedforward_del3/ck] [get_bd_pins update_gamma_del3/ck] [get_bd_pins update_kappa_del3/ck]
   connect_bd_net -net delay_10_o_data [get_bd_ports Kb_m] [get_bd_pins delay_10/o_data]
   connect_bd_net -net delay_11_o_data [get_bd_ports Kf_m] [get_bd_pins delay_11/o_data]
   connect_bd_net -net delay_12_o_data [get_bd_pins delay_12/o_data] [get_bd_pins update_feedforward_del3/e_m]
@@ -2636,7 +2226,6 @@ proc cr_bd_update_block { parentCell } {
   connect_bd_net -net delay_21_o_data [get_bd_ports beta_m] [get_bd_pins delay_21/o_data]
   connect_bd_net -net delay_22_o_data [get_bd_ports ys_m1] [get_bd_pins delay_22/o_data]
   connect_bd_net -net delay_23_o_data [get_bd_pins delay_23/o_data] [get_bd_pins update_feedforward_del3/ys_m]
-  connect_bd_net -net delay_5_o_data [get_bd_pins delay_5/o_data] [get_bd_pins update_chi_del6/chif_m]
   connect_bd_net -net div_data_valid_1 [get_bd_ports div_data_valid] [get_bd_pins scalar_delay_0/i_data]
   connect_bd_net -net e_m_1 [get_bd_ports e_m] [get_bd_pins delay_12/i_data]
   connect_bd_net -net eb1_m_1 [get_bd_ports eb1_m] [get_bd_pins update_epsilon_del1/eb1_m]
@@ -2647,12 +2236,6 @@ proc cr_bd_update_block { parentCell } {
   connect_bd_net -net ef_m_3 [get_bd_ports ef_m] [get_bd_pins update_epsilon_del1/ef_m] [get_bd_pins update_kappa_del3/ef_m]
   connect_bd_net -net gam1_m_2 [get_bd_ports gam1_m] [get_bd_pins update_kappa_del3/gam1_m]
   connect_bd_net -net gam_m_1 [get_bd_ports gam_m] [get_bd_pins update_gamma_del3/gam_m]
-  connect_bd_net -net scalar_delay_0_o_data [get_bd_pins scalar_delay_0/o_data] [get_bd_pins update_chi_del6/datain_valid]
-  connect_bd_net -net update_chi_del30_chib_m1 [get_bd_ports chib_m1] [get_bd_pins update_chi_del6/chib_m1]
-  connect_bd_net -net update_chi_del30_chif_m1 [get_bd_ports chif_m1] [get_bd_pins update_chi_del6/chif_m1]
-  connect_bd_net -net update_chi_del30_dataout_valid [get_bd_ports div_data_out_valid] [get_bd_pins update_chi_del6/dataout_valid]
-  connect_bd_net -net update_chi_del30_dividend_ready [get_bd_ports dividend_ready] [get_bd_pins update_chi_del6/dividend_ready]
-  connect_bd_net -net update_chi_del30_divisor_ready [get_bd_ports divisor_ready] [get_bd_pins update_chi_del6/divisor_ready]
   connect_bd_net -net update_feedforward_del2_ys_m1 [get_bd_pins delay_22/i_data] [get_bd_pins update_feedforward_del3/ys_m1]
   connect_bd_net -net update_feedforward_del4_e_m1 [get_bd_pins delay_17/i_data] [get_bd_pins update_feedforward_del3/e_m1]
   connect_bd_net -net update_feedforward_del4_v_m [get_bd_pins delay_18/i_data] [get_bd_pins update_feedforward_del3/v_m]
@@ -2680,221 +2263,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_block.bd ]
 # Create wrapper file for update_block.bd
 make_wrapper -files [get_files update_block.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files scalar_delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/scalar_delay.vhd"
-}
-
-
-# Proc to create BD chi_init
-proc cr_bd_chi_init { parentCell } {
-# The design that will be created by this Tcl proc contains the following 
-# module references:
-# scalar_delay
-
-
-
-  # CHANGE DESIGN NAME HERE
-  set design_name chi_init
-
-  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
-
-  create_bd_design $design_name
-
-  set bCheckIPsPassed 1
-  ##################################################################
-  # CHECK IPs
-  ##################################################################
-  set bCheckIPs 1
-  if { $bCheckIPs == 1 } {
-     set list_check_ips "\ 
-  xilinx.com:ip:c_addsub:12.0\
-  xilinx.com:ip:mult_gen:12.0\
-  xilinx.com:ip:xlslice:1.0\
-  xilinx.com:ip:dsp_macro:1.0\
-  "
-
-   set list_ips_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2011 -severity "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
-
-   foreach ip_vlnv $list_check_ips {
-      set ip_obj [get_ipdefs -all $ip_vlnv]
-      if { $ip_obj eq "" } {
-         lappend list_ips_missing $ip_vlnv
-      }
-   }
-
-   if { $list_ips_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2012 -severity "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
-      set bCheckIPsPassed 0
-   }
-
-  }
-
-  ##################################################################
-  # CHECK Modules
-  ##################################################################
-  set bCheckModules 1
-  if { $bCheckModules == 1 } {
-     set list_check_mods "\ 
-  scalar_delay\
-  "
-
-   set list_mods_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2020 -severity "INFO" "Checking if the following modules exist in the project's sources: $list_check_mods ."
-
-   foreach mod_vlnv $list_check_mods {
-      if { [can_resolve_reference $mod_vlnv] == 0 } {
-         lappend list_mods_missing $mod_vlnv
-      }
-   }
-
-   if { $list_mods_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2021 -severity "ERROR" "The following module(s) are not found in the project: $list_mods_missing" }
-      common::send_gid_msg -ssname BD::TCL -id 2022 -severity "INFO" "Please add source files for the missing module(s) above."
-      set bCheckIPsPassed 0
-   }
-}
-
-  if { $bCheckIPsPassed != 1 } {
-    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
-    return 3
-  }
-
-  variable script_folder
-
-  if { $parentCell eq "" } {
-     set parentCell [get_bd_cells /]
-  }
-
-  # Get object for parentCell
-  set parentObj [get_bd_cells $parentCell]
-  if { $parentObj == "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
-     return
-  }
-
-  # Make sure parentObj is hier blk
-  set parentType [get_property TYPE $parentObj]
-  if { $parentType ne "hier" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
-     return
-  }
-
-  # Save current instance; Restore later
-  set oldCurInst [current_bd_instance .]
-
-  # Set parent object as current
-  current_bd_instance $parentObj
-
-
-  # Create interface ports
-
-  # Create ports
-  set chi_init [ create_bd_port -dir O -from 17 -to 0 chi_init ]
-  set ck [ create_bd_port -dir I ck ]
-  set data_in_valid [ create_bd_port -dir I data_in_valid ]
-  set data_out_valid [ create_bd_port -dir O -type data data_out_valid ]
-  set x [ create_bd_port -dir I -from 17 -to 0 x ]
-  set xib1_1 [ create_bd_port -dir I -from 17 -to 0 xib1_1 ]
-
-  # Create instance: c_addsub_0, and set properties
-  set c_addsub_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 c_addsub_0 ]
-  set_property -dict [ list \
-   CONFIG.A_Width {18} \
-   CONFIG.B_Value {000000000000000000} \
-   CONFIG.B_Width {18} \
-   CONFIG.CE {false} \
-   CONFIG.Latency {0} \
-   CONFIG.Out_Width {18} \
- ] $c_addsub_0
-
-  # Create instance: lambda_xib1, and set properties
-  set lambda_xib1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mult_gen:12.0 lambda_xib1 ]
-  set_property -dict [ list \
-   CONFIG.ConstValue {32704} \
-   CONFIG.MultType {Constant_Coefficient_Multiplier} \
-   CONFIG.OutputWidthHigh {32} \
-   CONFIG.PipeStages {1} \
- ] $lambda_xib1
-
-  # Create instance: norm_x_squared, and set properties
-  set norm_x_squared [ create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice:1.0 norm_x_squared ]
-  set_property -dict [ list \
-   CONFIG.DIN_FROM {35} \
-   CONFIG.DIN_TO {20} \
-   CONFIG.DIN_WIDTH {36} \
-   CONFIG.DOUT_WIDTH {16} \
- ] $norm_x_squared
-
-  # Create instance: scalar_delay_0, and set properties
-  set block_name scalar_delay
-  set block_cell_name scalar_delay_0
-  if { [catch {set scalar_delay_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $scalar_delay_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {2} \
- ] $scalar_delay_0
-
-  # Create instance: x_squared, and set properties
-  set x_squared [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 x_squared ]
-  set_property -dict [ list \
-   CONFIG.a_width {18} \
-   CONFIG.areg_3 {false} \
-   CONFIG.areg_4 {false} \
-   CONFIG.b_width {18} \
-   CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {false} \
-   CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {false} \
-   CONFIG.creg_5 {false} \
-   CONFIG.instruction1 {A*B} \
-   CONFIG.mreg_5 {true} \
-   CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {36} \
-   CONFIG.p_width {36} \
-   CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {false} \
- ] $x_squared
-
-  # Create port connections
-  connect_bd_net -net c_addsub_0_S [get_bd_ports chi_init] [get_bd_pins c_addsub_0/S]
-  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins lambda_xib1/CLK] [get_bd_pins scalar_delay_0/i_ck] [get_bd_pins x_squared/CLK]
-  connect_bd_net -net data_in_valid_1 [get_bd_ports data_in_valid] [get_bd_pins scalar_delay_0/i_data]
-  connect_bd_net -net lambda_xib1_P [get_bd_pins c_addsub_0/B] [get_bd_pins lambda_xib1/P]
-  connect_bd_net -net norm_x_squared_Dout [get_bd_pins c_addsub_0/A] [get_bd_pins norm_x_squared/Dout]
-  connect_bd_net -net scalar_delay_0_o_data [get_bd_ports data_out_valid] [get_bd_pins scalar_delay_0/o_data]
-  connect_bd_net -net x_1 [get_bd_ports x] [get_bd_pins x_squared/A] [get_bd_pins x_squared/B]
-  connect_bd_net -net x_squared_P [get_bd_pins norm_x_squared/Din] [get_bd_pins x_squared/P]
-  connect_bd_net -net xib1_1_1 [get_bd_ports xib1_1] [get_bd_pins lambda_xib1/A]
-
-  # Create address segments
-
-
-  # Restore current instance
-  current_bd_instance $oldCurInst
-
-  save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
-  close_bd_design $design_name 
-}
-# End of cr_bd_chi_init()
-cr_bd_chi_init ""
-set_property REGISTERED_WITH_MANAGER "1" [get_files chi_init.bd ] 
-set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files chi_init.bd ] 
-
-
-# Create wrapper file for chi_init.bd
-make_wrapper -files [get_files chi_init.bd] -import -top
-
 
 # Create wrapper file for update_kappa.bd
 make_wrapper -files [get_files update_kappa.bd] -import -top
@@ -2910,10 +2278,6 @@ make_wrapper -files [get_files update_feedforward.bd] -import -top
 
 # Create wrapper file for update_epsilon.bd
 make_wrapper -files [get_files update_epsilon.bd] -import -top
-
-
-# Create wrapper file for update_chi.bd
-make_wrapper -files [get_files update_chi.bd] -import -top
 
 
 
@@ -3040,7 +2404,416 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files divider_test.bd ]
 # Create wrapper file for divider_test.bd
 make_wrapper -files [get_files divider_test.bd] -import -top
 
-generate_target all [get_files update_block.bd]
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
+}
+
+
+# Proc to create BD update_xi
+proc cr_bd_update_xi { parentCell } {
+# The design that will be created by this Tcl proc contains the following 
+# module references:
+# postmul_resizer, postmul_resizer
+
+
+
+  # CHANGE DESIGN NAME HERE
+  set design_name update_xi
+
+  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
+
+  create_bd_design $design_name
+
+  set bCheckIPsPassed 1
+  ##################################################################
+  # CHECK IPs
+  ##################################################################
+  set bCheckIPs 1
+  if { $bCheckIPs == 1 } {
+     set list_check_ips "\ 
+  xilinx.com:ip:dsp_macro:1.0\
+  xilinx.com:ip:mult_gen:12.0\
+  xilinx.com:ip:c_addsub:12.0\
+  "
+
+   set list_ips_missing ""
+   common::send_gid_msg -ssname BD::TCL -id 2011 -severity "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
+
+   foreach ip_vlnv $list_check_ips {
+      set ip_obj [get_ipdefs -all $ip_vlnv]
+      if { $ip_obj eq "" } {
+         lappend list_ips_missing $ip_vlnv
+      }
+   }
+
+   if { $list_ips_missing ne "" } {
+      catch {common::send_gid_msg -ssname BD::TCL -id 2012 -severity "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
+      set bCheckIPsPassed 0
+   }
+
+  }
+
+  ##################################################################
+  # CHECK Modules
+  ##################################################################
+  set bCheckModules 1
+  if { $bCheckModules == 1 } {
+     set list_check_mods "\ 
+  postmul_resizer\
+  postmul_resizer\
+  "
+
+   set list_mods_missing ""
+   common::send_gid_msg -ssname BD::TCL -id 2020 -severity "INFO" "Checking if the following modules exist in the project's sources: $list_check_mods ."
+
+   foreach mod_vlnv $list_check_mods {
+      if { [can_resolve_reference $mod_vlnv] == 0 } {
+         lappend list_mods_missing $mod_vlnv
+      }
+   }
+
+   if { $list_mods_missing ne "" } {
+      catch {common::send_gid_msg -ssname BD::TCL -id 2021 -severity "ERROR" "The following module(s) are not found in the project: $list_mods_missing" }
+      common::send_gid_msg -ssname BD::TCL -id 2022 -severity "INFO" "Please add source files for the missing module(s) above."
+      set bCheckIPsPassed 0
+   }
+}
+
+  if { $bCheckIPsPassed != 1 } {
+    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
+    return 3
+  }
+
+  variable script_folder
+
+  if { $parentCell eq "" } {
+     set parentCell [get_bd_cells /]
+  }
+
+  # Get object for parentCell
+  set parentObj [get_bd_cells $parentCell]
+  if { $parentObj == "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
+     return
+  }
+
+  # Make sure parentObj is hier blk
+  set parentType [get_property TYPE $parentObj]
+  if { $parentType ne "hier" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
+     return
+  }
+
+  # Save current instance; Restore later
+  set oldCurInst [current_bd_instance .]
+
+  # Set parent object as current
+  current_bd_instance $parentObj
+
+
+  # Create interface ports
+
+  # Create ports
+  set ck [ create_bd_port -dir I ck ]
+  set eb_m1 [ create_bd_port -dir I -from 17 -to 0 eb_m1 ]
+  set ef_m1 [ create_bd_port -dir I -from 17 -to 0 ef_m1 ]
+  set geb_m1 [ create_bd_port -dir I -from 17 -to 0 geb_m1 ]
+  set gef_m1 [ create_bd_port -dir I -from 17 -to 0 gef_m1 ]
+  set xib1_m1 [ create_bd_port -dir I -from 17 -to 0 xib1_m1 ]
+  set xib_m1 [ create_bd_port -dir O -from 17 -to 0 xib_m1 ]
+  set xif1_m1 [ create_bd_port -dir I -from 17 -to 0 xif1_m1 ]
+  set xif_m1 [ create_bd_port -dir O -from 17 -to 0 xif_m1 ]
+
+  # Create instance: gebsq, and set properties
+  set gebsq [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 gebsq ]
+  set_property -dict [ list \
+   CONFIG.areg_3 {false} \
+   CONFIG.areg_4 {false} \
+   CONFIG.breg_3 {false} \
+   CONFIG.breg_4 {false} \
+   CONFIG.creg_3 {false} \
+   CONFIG.creg_4 {false} \
+   CONFIG.creg_5 {false} \
+   CONFIG.instruction1 {A*B} \
+   CONFIG.mreg_5 {true} \
+   CONFIG.p_binarywidth {0} \
+   CONFIG.p_full_width {36} \
+   CONFIG.p_width {36} \
+   CONFIG.pipeline_options {Expert} \
+   CONFIG.preg_6 {false} \
+ ] $gebsq
+
+  # Create instance: gefsq, and set properties
+  set gefsq [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 gefsq ]
+  set_property -dict [ list \
+   CONFIG.areg_3 {false} \
+   CONFIG.areg_4 {false} \
+   CONFIG.breg_3 {false} \
+   CONFIG.breg_4 {false} \
+   CONFIG.creg_3 {false} \
+   CONFIG.creg_4 {false} \
+   CONFIG.creg_5 {false} \
+   CONFIG.instruction1 {A*B} \
+   CONFIG.mreg_5 {true} \
+   CONFIG.p_binarywidth {0} \
+   CONFIG.p_full_width {36} \
+   CONFIG.p_width {36} \
+   CONFIG.pipeline_options {Expert} \
+   CONFIG.preg_6 {false} \
+ ] $gefsq
+
+  # Create instance: mult_gen_0, and set properties
+  set mult_gen_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mult_gen:12.0 mult_gen_0 ]
+  set_property -dict [ list \
+   CONFIG.ConstValue {32704} \
+   CONFIG.MultType {Constant_Coefficient_Multiplier} \
+   CONFIG.OutputWidthHigh {32} \
+   CONFIG.Use_Custom_Output_Width {false} \
+ ] $mult_gen_0
+
+  # Create instance: mult_gen_1, and set properties
+  set mult_gen_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mult_gen:12.0 mult_gen_1 ]
+  set_property -dict [ list \
+   CONFIG.ConstValue {32704} \
+   CONFIG.MultType {Constant_Coefficient_Multiplier} \
+   CONFIG.OutputWidthHigh {32} \
+ ] $mult_gen_1
+
+  # Create instance: postmul_resizer_0, and set properties
+  set block_name postmul_resizer
+  set block_cell_name postmul_resizer_0
+  if { [catch {set postmul_resizer_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $postmul_resizer_0 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create instance: postmul_resizer_1, and set properties
+  set block_name postmul_resizer
+  set block_cell_name postmul_resizer_1
+  if { [catch {set postmul_resizer_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $postmul_resizer_1 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+  
+  # Create instance: xib_m1, and set properties
+  set xib_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 xib_m1 ]
+  set_property -dict [ list \
+   CONFIG.A_Width {18} \
+   CONFIG.Add_Mode {Subtract} \
+   CONFIG.B_Value {000000000000000000} \
+   CONFIG.B_Width {18} \
+   CONFIG.CE {false} \
+   CONFIG.Latency {0} \
+   CONFIG.Out_Width {18} \
+ ] $xib_m1
+
+  # Create instance: xif_m1, and set properties
+  set xif_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 xif_m1 ]
+  set_property -dict [ list \
+   CONFIG.A_Width {18} \
+   CONFIG.Add_Mode {Subtract} \
+   CONFIG.B_Value {000000000000000000} \
+   CONFIG.B_Width {18} \
+   CONFIG.CE {false} \
+   CONFIG.Latency {0} \
+   CONFIG.Out_Width {18} \
+ ] $xif_m1
+
+  # Create port connections
+  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins gebsq/CLK] [get_bd_pins gefsq/CLK] [get_bd_pins mult_gen_0/CLK] [get_bd_pins mult_gen_1/CLK]
+  connect_bd_net -net eb_m1_1 [get_bd_ports eb_m1] [get_bd_pins gebsq/A]
+  connect_bd_net -net ef_m1_1 [get_bd_ports ef_m1] [get_bd_pins gefsq/A]
+  connect_bd_net -net geb_m1_1 [get_bd_ports geb_m1] [get_bd_pins gebsq/B]
+  connect_bd_net -net gebsq_P [get_bd_pins gebsq/P] [get_bd_pins postmul_resizer_1/i_data]
+  connect_bd_net -net gef_m1_1 [get_bd_ports gef_m1] [get_bd_pins gefsq/B]
+  connect_bd_net -net gefsq_P [get_bd_pins gefsq/P] [get_bd_pins postmul_resizer_0/i_data]
+  connect_bd_net -net postmul_resizer_0_o_data [get_bd_pins postmul_resizer_0/o_data] [get_bd_pins xif_m1/B]
+  connect_bd_net -net postmul_resizer_1_o_data [get_bd_pins postmul_resizer_1/o_data] [get_bd_pins xib_m1/B]
+  connect_bd_net -net xib1_m1_1 [get_bd_ports xib1_m1] [get_bd_pins mult_gen_1/A]
+  connect_bd_net -net xib_m1_S [get_bd_ports xib_m1] [get_bd_pins xib_m1/S]
+  connect_bd_net -net xif1_m1_1 [get_bd_ports xif1_m1] [get_bd_pins mult_gen_0/A]
+  connect_bd_net -net xif_m1_S [get_bd_ports xif_m1] [get_bd_pins xif_m1/S]
+
+  # Create address segments
+
+
+  # Restore current instance
+  current_bd_instance $oldCurInst
+
+  save_bd_design
+common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
+
+  close_bd_design $design_name 
+}
+# End of cr_bd_update_xi()
+cr_bd_update_xi ""
+set_property REGISTERED_WITH_MANAGER "1" [get_files update_xi.bd ] 
+set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_xi.bd ] 
+
+
+# Create wrapper file for update_xi.bd
+make_wrapper -files [get_files update_xi.bd] -import -top
+
+
+
+# Proc to create BD init_chi
+proc cr_bd_init_chi { parentCell } {
+
+  # CHANGE DESIGN NAME HERE
+  set design_name init_chi
+
+  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
+
+  create_bd_design $design_name
+
+  set bCheckIPsPassed 1
+  ##################################################################
+  # CHECK IPs
+  ##################################################################
+  set bCheckIPs 1
+  if { $bCheckIPs == 1 } {
+     set list_check_ips "\ 
+  xilinx.com:ip:dsp_macro:1.0\
+  xilinx.com:ip:mult_gen:12.0\
+  xilinx.com:ip:c_addsub:12.0\
+  "
+
+   set list_ips_missing ""
+   common::send_gid_msg -ssname BD::TCL -id 2011 -severity "INFO" "Checking if the following IPs exist in the project's IP catalog: $list_check_ips ."
+
+   foreach ip_vlnv $list_check_ips {
+      set ip_obj [get_ipdefs -all $ip_vlnv]
+      if { $ip_obj eq "" } {
+         lappend list_ips_missing $ip_vlnv
+      }
+   }
+
+   if { $list_ips_missing ne "" } {
+      catch {common::send_gid_msg -ssname BD::TCL -id 2012 -severity "ERROR" "The following IPs are not found in the IP Catalog:\n  $list_ips_missing\n\nResolution: Please add the repository containing the IP(s) to the project." }
+      set bCheckIPsPassed 0
+   }
+
+  }
+
+  if { $bCheckIPsPassed != 1 } {
+    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
+    return 3
+  }
+
+  variable script_folder
+
+  if { $parentCell eq "" } {
+     set parentCell [get_bd_cells /]
+  }
+
+  # Get object for parentCell
+  set parentObj [get_bd_cells $parentCell]
+  if { $parentObj == "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
+     return
+  }
+
+  # Make sure parentObj is hier blk
+  set parentType [get_property TYPE $parentObj]
+  if { $parentType ne "hier" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
+     return
+  }
+
+  # Save current instance; Restore later
+  set oldCurInst [current_bd_instance .]
+
+  # Set parent object as current
+  current_bd_instance $parentObj
+
+
+  # Create interface ports
+
+  # Create ports
+  set ck [ create_bd_port -dir I ck ]
+  set x [ create_bd_port -dir I -from 17 -to 0 x ]
+  set xi1_1 [ create_bd_port -dir I -from 17 -to 0 xi1_1 ]
+  set xi_init [ create_bd_port -dir O -from 17 -to 0 xi_init ]
+
+  # Create instance: gefsq, and set properties
+  set gefsq [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 gefsq ]
+  set_property -dict [ list \
+   CONFIG.areg_3 {false} \
+   CONFIG.areg_4 {false} \
+   CONFIG.breg_3 {false} \
+   CONFIG.breg_4 {false} \
+   CONFIG.creg_3 {false} \
+   CONFIG.creg_4 {false} \
+   CONFIG.creg_5 {false} \
+   CONFIG.instruction1 {A*B} \
+   CONFIG.mreg_5 {true} \
+   CONFIG.p_binarywidth {0} \
+   CONFIG.p_full_width {36} \
+   CONFIG.p_width {36} \
+   CONFIG.pipeline_options {Expert} \
+   CONFIG.preg_6 {false} \
+ ] $gefsq
+
+  # Create instance: mult_gen_0, and set properties
+  set mult_gen_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:mult_gen:12.0 mult_gen_0 ]
+  set_property -dict [ list \
+   CONFIG.ConstValue {32704} \
+   CONFIG.MultType {Constant_Coefficient_Multiplier} \
+   CONFIG.OutputWidthHigh {32} \
+   CONFIG.Use_Custom_Output_Width {false} \
+ ] $mult_gen_0
+
+  # Create instance: xif_m1, and set properties
+  set xif_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 xif_m1 ]
+  set_property -dict [ list \
+   CONFIG.A_Width {18} \
+   CONFIG.Add_Mode {Subtract} \
+   CONFIG.B_Value {000000000000000000} \
+   CONFIG.B_Width {18} \
+   CONFIG.CE {false} \
+   CONFIG.Latency {0} \
+   CONFIG.Out_Width {18} \
+ ] $xif_m1
+
+  # Create port connections
+  connect_bd_net -net chi1_1_1 [get_bd_ports xi1_1] [get_bd_pins mult_gen_0/A]
+  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins gefsq/CLK] [get_bd_pins mult_gen_0/CLK]
+  connect_bd_net -net x_1 [get_bd_ports x] [get_bd_pins gefsq/A] [get_bd_pins gefsq/B]
+
+  # Create address segments
+
+
+  # Restore current instance
+  current_bd_instance $oldCurInst
+
+  save_bd_design
+common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
+
+  close_bd_design $design_name 
+}
+# End of cr_bd_init_chi()
+cr_bd_init_chi ""
+set_property REGISTERED_WITH_MANAGER "1" [get_files init_chi.bd ] 
+set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files init_chi.bd ] 
+
+
+# Create wrapper file for init_chi.bd
+make_wrapper -files [get_files init_chi.bd] -import -top
 
 generate_target all [get_files update_feedforward.bd]
 
