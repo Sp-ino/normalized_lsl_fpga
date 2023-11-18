@@ -20,7 +20,6 @@ architecture behavioral of tb is
             eb_m : in std_logic_vector ( 17 downto 0 );
             gam_m : in std_logic_vector ( 17 downto 0 );
             gam_m1 : out std_logic_vector ( 17 downto 0 );
-            beta_m : out std_logic_vector ( 17 downto 0 )
         );
     end component;
 
@@ -28,12 +27,12 @@ architecture behavioral of tb is
     signal chi: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
     signal eb: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
     signal gam: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
-    signal res_beta: std_logic_vector (word_len - 1 downto 0);
     signal res_gam: std_logic_vector (word_len - 1 downto 0);
 
     constant tck: time := 10ns;
     constant a_val: std_logic_vector := b"001010101010111011";
     constant b_val: std_logic_vector := b"000110000000001011";
+    constant c_val: std_logic_vector := b"000110000000001011";
 
 begin
 
@@ -43,7 +42,6 @@ begin
         eb_m => eb,
         gam_m => gam,
         ck => ck,
-        beta_m => res_beta,
         gam_m1 => res_gam 
     );
 
@@ -62,13 +60,13 @@ begin
     begin
 
         wait for 2*tck;
-        eb <= b_val;
+        eb <= c_val;
         gam <= b_val;
         chi <= a_val;
         
         wait for 4*tck;
 
-        wait for 20*tck;
+        wait for 10*tck;
 
         ------------------------------VERIFICATION------------------------------------------
         ------------------------------------------------------------------------------------

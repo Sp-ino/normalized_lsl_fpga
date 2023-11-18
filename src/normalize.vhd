@@ -16,10 +16,11 @@ end normalize;
 
 
 architecture  behavioral of normalize is
+    constant right_shift_amount: integer := 5; 
 begin
 
     o_data(word_len - 1) <= i_data(2*word_len - 1);
     o_data(word_len - 2) <= i_data(2*word_len - 1);
-    o_data(word_len - 3 downto 0) <= i_data(2*word_len - 1 downto fraction_len + 5);
+    o_data(word_len - 3 downto 0) <= i_data(2*word_len - 1 downto frac_len + right_shift_amount);
 
 end behavioral;
