@@ -20,10 +20,10 @@ proc checkRequiredFiles { origin_dir} {
   set files [list \
  "[file normalize "$origin_dir/../lsl_fpga/src/dsp_pkg.vhd"]"\
  "[file normalize "$origin_dir/src/dsp_pkg.vhd"]"\
- "[file normalize "$origin_dir/src/delay.vhd"]"\
- "[file normalize "$origin_dir/src/scalar_delay.vhd"]"\
  "[file normalize "$origin_dir/../lsl_fpga/src/update_slice.vhd"]"\
  "[file normalize "$origin_dir/src/lsl_core.vhd"]"\
+ "[file normalize "$origin_dir/src/delay.vhd"]"\
+ "[file normalize "$origin_dir/src/scalar_delay.vhd"]"\
  "[file normalize "$origin_dir/src/postmul_resizer_wideinput.vhd"]"\
  "[file normalize "$origin_dir/src/c_port_resizer.vhd"]"\
  "[file normalize "$origin_dir/src/postmul_resizer.vhd"]"\
@@ -179,10 +179,10 @@ set obj [get_filesets sources_1]
 set files [list \
  [file normalize "${origin_dir}/../lsl_fpga/src/dsp_pkg.vhd"] \
  [file normalize "${origin_dir}/src/dsp_pkg.vhd"] \
- [file normalize "${origin_dir}/src/delay.vhd"] \
- [file normalize "${origin_dir}/src/scalar_delay.vhd"] \
  [file normalize "${origin_dir}/../lsl_fpga/src/update_slice.vhd"] \
  [file normalize "${origin_dir}/src/lsl_core.vhd"] \
+ [file normalize "${origin_dir}/src/delay.vhd"] \
+ [file normalize "${origin_dir}/src/scalar_delay.vhd"] \
  [file normalize "${origin_dir}/src/postmul_resizer_wideinput.vhd"] \
  [file normalize "${origin_dir}/src/c_port_resizer.vhd"] \
  [file normalize "${origin_dir}/src/postmul_resizer.vhd"] \
@@ -204,22 +204,22 @@ set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
-set file "$origin_dir/src/delay.vhd"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
-set file "$origin_dir/src/scalar_delay.vhd"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
 set file "$origin_dir/../lsl_fpga/src/update_slice.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "$origin_dir/src/lsl_core.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
+set file "$origin_dir/src/delay.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
+set file "$origin_dir/src/scalar_delay.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
@@ -281,6 +281,18 @@ set obj [get_filesets constrs_1]
 # Set 'constrs_1' fileset properties
 set obj [get_filesets constrs_1]
 set_property -name "target_part" -value "xc7a35tcpg236-1" -objects $obj
+
+# Create 'sim_1' fileset (if not found)
+if {[string equal [get_filesets -quiet sim_1] ""]} {
+  create_fileset -simset sim_1
+}
+
+# Set 'sim_1' fileset object
+set obj [get_filesets sim_1]
+# Empty (no sources present)
+
+# Set 'sim_1' fileset properties
+set obj [get_filesets sim_1]
 
 # Create 'test_gamma_update' fileset (if not found)
 if {[string equal [get_filesets -quiet test_gamma_update] ""]} {
@@ -410,44 +422,29 @@ if { [get_files dsp_pkg.vhd] == "" } {
 if { [get_files c_port_resizer.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
 }
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files mux.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files mux.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files mux.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
-}
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
 if { [get_files delay.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
 }
 
 
@@ -762,15 +759,10 @@ cr_bd_update_kappa ""
 set_property REGISTERED_WITH_MANAGER "1" [get_files update_kappa.bd ] 
 set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_kappa.bd ] 
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
+
+# Create wrapper file for update_kappa.bd
+make_wrapper -files [get_files update_kappa.bd] -import -top
+
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
@@ -1045,17 +1037,42 @@ cr_bd_update_epsilon ""
 set_property REGISTERED_WITH_MANAGER "1" [get_files update_epsilon.bd ] 
 set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_epsilon.bd ] 
 
+
+# Create wrapper file for update_epsilon.bd
+make_wrapper -files [get_files update_epsilon.bd] -import -top
+
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
 if { [get_files c_port_resizer.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
 }
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
 if { [get_files delay.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
 }
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
 if { [get_files normalize.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
@@ -1063,36 +1080,6 @@ if { [get_files normalize.vhd] == "" } {
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
 if { [get_files postmul_resizer_wideinput.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
 }
@@ -1107,12 +1094,6 @@ if { [get_files dsp_pkg.vhd] == "" } {
 }
 if { [get_files postmul_resizer_wideinput.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
 }
 
 
@@ -1252,7 +1233,7 @@ proc cr_bd_update_feedforward { parentCell } {
    CONFIG.breg_3 {false} \
    CONFIG.breg_4 {false} \
    CONFIG.c_binarywidth {18} \
-   CONFIG.c_width {36} \
+   CONFIG.c_width {48} \
    CONFIG.concat_binarywidth {18} \
    CONFIG.concat_width {48} \
    CONFIG.creg_1 {false} \
@@ -1417,7 +1398,7 @@ proc cr_bd_update_feedforward { parentCell } {
    CONFIG.breg_3 {false} \
    CONFIG.breg_4 {false} \
    CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {36} \
+   CONFIG.c_width {48} \
    CONFIG.concat_binarywidth {0} \
    CONFIG.concat_width {48} \
    CONFIG.creg_3 {false} \
@@ -1483,6 +1464,10 @@ proc cr_bd_update_feedforward { parentCell } {
 cr_bd_update_feedforward ""
 set_property REGISTERED_WITH_MANAGER "1" [get_files update_feedforward.bd ] 
 set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_feedforward.bd ] 
+
+
+# Create wrapper file for update_feedforward.bd
+make_wrapper -files [get_files update_feedforward.bd] -import -top
 
 
 
@@ -1595,7 +1580,7 @@ proc cr_bd_update_gamma { parentCell } {
    CONFIG.breg_3 {false} \
    CONFIG.breg_4 {false} \
    CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {36} \
+   CONFIG.c_width {48} \
    CONFIG.concat_binarywidth {0} \
    CONFIG.concat_width {48} \
    CONFIG.creg_1 {false} \
@@ -1653,627 +1638,9 @@ cr_bd_update_gamma ""
 set_property REGISTERED_WITH_MANAGER "1" [get_files update_gamma.bd ] 
 set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_gamma.bd ] 
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files scalar_delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/scalar_delay.vhd"
-}
-
-
-# Proc to create BD update_block
-proc cr_bd_update_block { parentCell } {
-# The design that will be created by this Tcl proc contains the following 
-# module references:
-# delay, delay, delay, delay, delay, delay, delay, delay, delay, delay, delay, delay, delay, delay, delay, scalar_delay
-
-
-# The design that will be created by this Tcl proc contains the following 
-# block design container source references:
-# update_epsilon, update_feedforward, update_gamma, update_kappa
-
-
-
-  # CHANGE DESIGN NAME HERE
-  set design_name update_block
-
-  common::send_gid_msg -ssname BD::TCL -id 2010 -severity "INFO" "Currently there is no design <$design_name> in project, so creating one..."
-
-  create_bd_design $design_name
-
-  # Add USER_COMMENTS on $design_name
-  set_property USER_COMMENTS.comment_0 "total delay: 4" [get_bd_designs $design_name]
-
-  set bCheckIPsPassed 1
-  ##################################################################
-  # CHECK Modules
-  ##################################################################
-  set bCheckModules 1
-  if { $bCheckModules == 1 } {
-     set list_check_mods "\ 
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  delay\
-  scalar_delay\
-  "
-
-   set list_mods_missing ""
-   common::send_gid_msg -ssname BD::TCL -id 2020 -severity "INFO" "Checking if the following modules exist in the project's sources: $list_check_mods ."
-
-   foreach mod_vlnv $list_check_mods {
-      if { [can_resolve_reference $mod_vlnv] == 0 } {
-         lappend list_mods_missing $mod_vlnv
-      }
-   }
-
-   if { $list_mods_missing ne "" } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2021 -severity "ERROR" "The following module(s) are not found in the project: $list_mods_missing" }
-      common::send_gid_msg -ssname BD::TCL -id 2022 -severity "INFO" "Please add source files for the missing module(s) above."
-      set bCheckIPsPassed 0
-   }
-}
-
-  ##################################################################
-  # CHECK Block Design Container Sources
-  ##################################################################
-  set bCheckSources 1
-  set list_bdc_active "update_epsilon, update_feedforward, update_gamma, update_kappa"
-
-  array set map_bdc_missing {}
-  set map_bdc_missing(ACTIVE) ""
-  set map_bdc_missing(BDC) ""
-
-  if { $bCheckSources == 1 } {
-     set list_check_srcs "\ 
-  update_epsilon \
-  update_feedforward \
-  update_gamma \
-  update_kappa \
-  "
-
-   common::send_gid_msg -ssname BD::TCL -id 2056 -severity "INFO" "Checking if the following sources for block design container exist in the project: $list_check_srcs .\n\n"
-
-   foreach src $list_check_srcs {
-      if { [can_resolve_reference $src] == 0 } {
-         if { [lsearch $list_bdc_active $src] != -1 } {
-            set map_bdc_missing(ACTIVE) "$map_bdc_missing(ACTIVE) $src"
-         } else {
-            set map_bdc_missing(BDC) "$map_bdc_missing(BDC) $src"
-         }
-      }
-   }
-
-   if { [llength $map_bdc_missing(ACTIVE)] > 0 } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2057 -severity "ERROR" "The following source(s) of Active variants are not found in the project: $map_bdc_missing(ACTIVE)" }
-      common::send_gid_msg -ssname BD::TCL -id 2060 -severity "INFO" "Please add source files for the missing source(s) above."
-      set bCheckIPsPassed 0
-   }
-   if { [llength $map_bdc_missing(BDC)] > 0 } {
-      catch {common::send_gid_msg -ssname BD::TCL -id 2059 -severity "WARNING" "The following source(s) of variants are not found in the project: $map_bdc_missing(BDC)" }
-      common::send_gid_msg -ssname BD::TCL -id 2060 -severity "INFO" "Please add source files for the missing source(s) above."
-   }
-}
-
-  if { $bCheckIPsPassed != 1 } {
-    common::send_gid_msg -ssname BD::TCL -id 2023 -severity "WARNING" "Will not continue with creation of design due to the error(s) above."
-    return 3
-  }
-
-  variable script_folder
-
-  if { $parentCell eq "" } {
-     set parentCell [get_bd_cells /]
-  }
-
-  # Get object for parentCell
-  set parentObj [get_bd_cells $parentCell]
-  if { $parentObj == "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2090 -severity "ERROR" "Unable to find parent cell <$parentCell>!"}
-     return
-  }
-
-  # Make sure parentObj is hier blk
-  set parentType [get_property TYPE $parentObj]
-  if { $parentType ne "hier" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2091 -severity "ERROR" "Parent <$parentObj> has TYPE = <$parentType>. Expected to be <hier>."}
-     return
-  }
-
-  # Save current instance; Restore later
-  set oldCurInst [current_bd_instance .]
-
-  # Set parent object as current
-  current_bd_instance $parentObj
-
-
-  # Create interface ports
-
-  # Create ports
-  set Kb1_m [ create_bd_port -dir I -from 17 -to 0 Kb1_m ]
-  set Kb_m [ create_bd_port -dir O -from 17 -to 0 Kb_m ]
-  set Kf1_m [ create_bd_port -dir I -from 17 -to 0 Kf1_m ]
-  set Kf_m [ create_bd_port -dir O -from 17 -to 0 Kf_m ]
-  set beta1_m [ create_bd_port -dir I -from 17 -to 0 beta1_m ]
-  set beta_m [ create_bd_port -dir O -from 17 -to 0 beta_m ]
-  set chib1_m [ create_bd_port -dir I -from 17 -to 0 chib1_m ]
-  set chib_m [ create_bd_port -dir I -from 17 -to 0 chib_m ]
-  set chib_m1 [ create_bd_port -dir O -from 17 -to 0 chib_m1 ]
-  set chif_m [ create_bd_port -dir I -from 17 -to 0 chif_m ]
-  set chif_m1 [ create_bd_port -dir O -from 17 -to 0 chif_m1 ]
-  set ck [ create_bd_port -dir I ck ]
-  set div_data_out_valid [ create_bd_port -dir O div_data_out_valid ]
-  set div_data_valid [ create_bd_port -dir I div_data_valid ]
-  set dividend_ready [ create_bd_port -dir O dividend_ready ]
-  set divisor_ready [ create_bd_port -dir O divisor_ready ]
-  set e_m [ create_bd_port -dir I -from 17 -to 0 e_m ]
-  set e_m1 [ create_bd_port -dir O -from 17 -to 0 e_m1 ]
-  set eb1_m [ create_bd_port -dir I -from 17 -to 0 eb1_m ]
-  set eb_m [ create_bd_port -dir I -from 17 -to 0 eb_m ]
-  set eb_m1 [ create_bd_port -dir O -from 17 -to 0 eb_m1 ]
-  set ef_m [ create_bd_port -dir I -from 17 -to 0 ef_m ]
-  set ef_m1 [ create_bd_port -dir O -from 17 -to 0 ef_m1 ]
-  set gam1_m [ create_bd_port -dir I -from 17 -to 0 gam1_m ]
-  set gam_m [ create_bd_port -dir I -from 17 -to 0 gam_m ]
-  set gam_m1 [ create_bd_port -dir O -from 17 -to 0 gam_m1 ]
-  set v1_m [ create_bd_port -dir I -from 17 -to 0 v1_m ]
-  set v_m [ create_bd_port -dir O -from 17 -to 0 v_m ]
-  set ys_m [ create_bd_port -dir I -from 17 -to 0 ys_m ]
-  set ys_m1 [ create_bd_port -dir O -from 17 -to 0 ys_m1 ]
-
-  # Create instance: delay_5, and set properties
-  set block_name delay
-  set block_cell_name delay_5
-  if { [catch {set delay_5 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_5 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $delay_5
-
-  # Create instance: delay_7, and set properties
-  set block_name delay
-  set block_cell_name delay_7
-  if { [catch {set delay_7 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_7 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $delay_7
-
-  # Create instance: delay_10, and set properties
-  set block_name delay
-  set block_cell_name delay_10
-  if { [catch {set delay_10 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_10 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {4} \
- ] $delay_10
-
-  # Create instance: delay_11, and set properties
-  set block_name delay
-  set block_cell_name delay_11
-  if { [catch {set delay_11 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_11 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {4} \
- ] $delay_11
-
-  # Create instance: delay_12, and set properties
-  set block_name delay
-  set block_cell_name delay_12
-  if { [catch {set delay_12 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_12 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $delay_12
-
-  # Create instance: delay_13, and set properties
-  set block_name delay
-  set block_cell_name delay_13
-  if { [catch {set delay_13 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_13 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $delay_13
-
-  # Create instance: delay_14, and set properties
-  set block_name delay
-  set block_cell_name delay_14
-  if { [catch {set delay_14 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_14 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $delay_14
-
-  # Create instance: delay_15, and set properties
-  set block_name delay
-  set block_cell_name delay_15
-  if { [catch {set delay_15 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_15 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {6} \
- ] $delay_15
-
-  # Create instance: delay_16, and set properties
-  set block_name delay
-  set block_cell_name delay_16
-  if { [catch {set delay_16 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_16 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {6} \
- ] $delay_16
-
-  # Create instance: delay_17, and set properties
-  set block_name delay
-  set block_cell_name delay_17
-  if { [catch {set delay_17 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_17 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $delay_17
-
-  # Create instance: delay_18, and set properties
-  set block_name delay
-  set block_cell_name delay_18
-  if { [catch {set delay_18 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_18 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $delay_18
-
-  # Create instance: delay_19, and set properties
-  set block_name delay
-  set block_cell_name delay_19
-  if { [catch {set delay_19 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_19 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $delay_19
-
-  # Create instance: delay_21, and set properties
-  set block_name delay
-  set block_cell_name delay_21
-  if { [catch {set delay_21 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_21 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {4} \
- ] $delay_21
-
-  # Create instance: delay_22, and set properties
-  set block_name delay
-  set block_cell_name delay_22
-  if { [catch {set delay_22 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_22 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {1} \
- ] $delay_22
-
-  # Create instance: delay_23, and set properties
-  set block_name delay
-  set block_cell_name delay_23
-  if { [catch {set delay_23 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $delay_23 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $delay_23
-
-  # Create instance: scalar_delay_0, and set properties
-  set block_name scalar_delay
-  set block_cell_name scalar_delay_0
-  if { [catch {set scalar_delay_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $scalar_delay_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-    set_property -dict [ list \
-   CONFIG.delay_len {3} \
- ] $scalar_delay_0
-
-  # Create instance: update_epsilon_del1, and set properties
-  set update_epsilon_del1 [ create_bd_cell -type container -reference update_epsilon update_epsilon_del1 ]
-  set_property USER_COMMENTS.comment_1 "total delay: 1" [get_bd_cells /update_epsilon_del1]
-  set_property USER_COMMENTS.comment_2 "total delay: 1" [get_bd_cells /update_epsilon_del1]
-  set_property -dict [ list \
-   CONFIG.ACTIVE_SIM_BD {update_epsilon.bd} \
-   CONFIG.ACTIVE_SYNTH_BD {update_epsilon.bd} \
-   CONFIG.ENABLE_DFX {0} \
-   CONFIG.LIST_SIM_BD {update_epsilon.bd} \
-   CONFIG.LIST_SYNTH_BD {update_epsilon.bd} \
-   CONFIG.LOCK_PROPAGATE {0} \
- ] $update_epsilon_del1
-
-  # Create instance: update_feedforward_del3, and set properties
-  set update_feedforward_del3 [ create_bd_cell -type container -reference update_feedforward update_feedforward_del3 ]
-  set_property USER_COMMENTS.comment_0 "total delay: 3
- samples" [get_bd_cells /update_feedforward_del3]
-  set_property USER_COMMENTS.comment_1 "total delay: 3
- samples" [get_bd_cells /update_feedforward_del3]
-  set_property -dict [ list \
-   CONFIG.ACTIVE_SIM_BD {update_feedforward.bd} \
-   CONFIG.ACTIVE_SYNTH_BD {update_feedforward.bd} \
-   CONFIG.ENABLE_DFX {0} \
-   CONFIG.LIST_SIM_BD {update_feedforward.bd} \
-   CONFIG.LIST_SYNTH_BD {update_feedforward.bd} \
-   CONFIG.LOCK_PROPAGATE {0} \
- ] $update_feedforward_del3
-
-  # Create instance: update_gamma_del3, and set properties
-  set update_gamma_del3 [ create_bd_cell -type container -reference update_gamma update_gamma_del3 ]
-  set_property USER_COMMENTS.comment_0 "total delay: 4 for gam
-3 for beta" [get_bd_cells /update_gamma_del3]
-  set_property -dict [ list \
-   CONFIG.ACTIVE_SIM_BD {update_gamma.bd} \
-   CONFIG.ACTIVE_SYNTH_BD {update_gamma.bd} \
-   CONFIG.ENABLE_DFX {0} \
-   CONFIG.LIST_SIM_BD {update_gamma.bd} \
-   CONFIG.LIST_SYNTH_BD {update_gamma.bd} \
-   CONFIG.LOCK_PROPAGATE {0} \
- ] $update_gamma_del3
-
-  # Create instance: update_kappa_del3, and set properties
-  set update_kappa_del3 [ create_bd_cell -type container -reference update_kappa update_kappa_del3 ]
-  set_property USER_COMMENTS.comment_0 "total delay: 3" [get_bd_cells /update_kappa_del3]
-  set_property -dict [ list \
-   CONFIG.ACTIVE_SIM_BD {update_kappa.bd} \
-   CONFIG.ACTIVE_SYNTH_BD {update_kappa.bd} \
-   CONFIG.ENABLE_DFX {0} \
-   CONFIG.LIST_SIM_BD {update_kappa.bd} \
-   CONFIG.LIST_SYNTH_BD {update_kappa.bd} \
-   CONFIG.LOCK_PROPAGATE {0} \
- ] $update_kappa_del3
-
-  # Create port connections
-  connect_bd_net -net Kb1_m_1 [get_bd_ports Kb1_m] [get_bd_pins update_epsilon_del1/Kb1_m] [get_bd_pins update_kappa_del3/Kb1_m]
-  connect_bd_net -net Kb_m_1 [get_bd_pins delay_10/i_data] [get_bd_pins update_kappa_del3/Kb_m]
-  connect_bd_net -net Kf1_m_2 [get_bd_ports Kf1_m] [get_bd_pins update_epsilon_del1/Kf1_m] [get_bd_pins update_kappa_del3/Kf1_m]
-  connect_bd_net -net Kf_m_1 [get_bd_pins delay_11/i_data] [get_bd_pins update_kappa_del3/Kf_m]
-  connect_bd_net -net beta1_m_1 [get_bd_ports beta1_m] [get_bd_pins update_kappa_del3/beta1_m]
-  connect_bd_net -net beta_m_1 [get_bd_pins delay_21/i_data] [get_bd_pins update_feedforward_del3/beta_m] [get_bd_pins update_gamma_del3/beta_m]
-  connect_bd_net -net chib1_m_1 [get_bd_ports chib1_m] [get_bd_pins delay_7/i_data]
-  connect_bd_net -net chib_m_1 [get_bd_ports chib_m] [get_bd_pins update_gamma_del3/chib_m]
-  connect_bd_net -net chif_m_2 [get_bd_ports chif_m] [get_bd_pins delay_5/i_data]
-  connect_bd_net -net ck_2 [get_bd_ports ck] [get_bd_pins delay_10/i_ck] [get_bd_pins delay_11/i_ck] [get_bd_pins delay_12/i_ck] [get_bd_pins delay_13/i_ck] [get_bd_pins delay_14/i_ck] [get_bd_pins delay_15/i_ck] [get_bd_pins delay_16/i_ck] [get_bd_pins delay_17/i_ck] [get_bd_pins delay_18/i_ck] [get_bd_pins delay_19/i_ck] [get_bd_pins delay_21/i_ck] [get_bd_pins delay_22/i_ck] [get_bd_pins delay_23/i_ck] [get_bd_pins delay_5/i_ck] [get_bd_pins delay_7/i_ck] [get_bd_pins scalar_delay_0/i_ck] [get_bd_pins update_epsilon_del1/ck] [get_bd_pins update_feedforward_del3/ck] [get_bd_pins update_gamma_del3/ck] [get_bd_pins update_kappa_del3/ck]
-  connect_bd_net -net delay_10_o_data [get_bd_ports Kb_m] [get_bd_pins delay_10/o_data]
-  connect_bd_net -net delay_11_o_data [get_bd_ports Kf_m] [get_bd_pins delay_11/o_data]
-  connect_bd_net -net delay_12_o_data [get_bd_pins delay_12/o_data] [get_bd_pins update_feedforward_del3/e_m]
-  connect_bd_net -net delay_14_o_data [get_bd_pins delay_14/o_data] [get_bd_pins update_feedforward_del3/v1_m]
-  connect_bd_net -net delay_15_o_data [get_bd_ports ef_m1] [get_bd_pins delay_15/o_data]
-  connect_bd_net -net delay_16_o_data [get_bd_ports eb_m1] [get_bd_pins delay_16/o_data]
-  connect_bd_net -net delay_17_o_data [get_bd_ports e_m1] [get_bd_pins delay_17/o_data]
-  connect_bd_net -net delay_18_o_data [get_bd_ports v_m] [get_bd_pins delay_18/o_data]
-  connect_bd_net -net delay_19_o_data [get_bd_ports gam_m1] [get_bd_pins delay_19/o_data]
-  connect_bd_net -net delay_21_o_data [get_bd_ports beta_m] [get_bd_pins delay_21/o_data]
-  connect_bd_net -net delay_22_o_data [get_bd_ports ys_m1] [get_bd_pins delay_22/o_data]
-  connect_bd_net -net delay_23_o_data [get_bd_pins delay_23/o_data] [get_bd_pins update_feedforward_del3/ys_m]
-  connect_bd_net -net div_data_valid_1 [get_bd_ports div_data_valid] [get_bd_pins scalar_delay_0/i_data]
-  connect_bd_net -net e_m_1 [get_bd_ports e_m] [get_bd_pins delay_12/i_data]
-  connect_bd_net -net eb1_m_1 [get_bd_ports eb1_m] [get_bd_pins update_epsilon_del1/eb1_m]
-  connect_bd_net -net eb_m1_1 [get_bd_pins delay_16/i_data] [get_bd_pins update_epsilon_del1/eb_m1] [get_bd_pins update_kappa_del3/eb_m1]
-  connect_bd_net -net eb_m_1 [get_bd_ports eb_m] [get_bd_pins delay_13/i_data] [get_bd_pins update_gamma_del3/eb_m]
-  connect_bd_net -net eb_m_3 [get_bd_pins delay_13/o_data] [get_bd_pins update_feedforward_del3/eb_m]
-  connect_bd_net -net ef_m1_1 [get_bd_pins delay_15/i_data] [get_bd_pins update_epsilon_del1/ef_m1] [get_bd_pins update_kappa_del3/ef_m1]
-  connect_bd_net -net ef_m_3 [get_bd_ports ef_m] [get_bd_pins update_epsilon_del1/ef_m]
-  connect_bd_net -net gam1_m_2 [get_bd_ports gam1_m]
-  connect_bd_net -net gam_m_1 [get_bd_ports gam_m] [get_bd_pins update_gamma_del3/gam_m]
-  connect_bd_net -net update_feedforward_del2_ys_m1 [get_bd_pins delay_22/i_data] [get_bd_pins update_feedforward_del3/ys_m1]
-  connect_bd_net -net update_feedforward_del4_e_m1 [get_bd_pins delay_17/i_data] [get_bd_pins update_feedforward_del3/e_m1]
-  connect_bd_net -net update_feedforward_del4_v_m [get_bd_pins delay_18/i_data] [get_bd_pins update_feedforward_del3/v_m]
-  connect_bd_net -net update_gamma_del6_gam_m1 [get_bd_pins delay_19/i_data] [get_bd_pins update_gamma_del3/gam_m1]
-  connect_bd_net -net v1_m_1 [get_bd_ports v1_m] [get_bd_pins delay_14/i_data]
-  connect_bd_net -net ys_m_1 [get_bd_ports ys_m] [get_bd_pins delay_23/i_data]
-
-  # Create address segments
-
-
-  # Restore current instance
-  current_bd_instance $oldCurInst
-
-  save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
-  close_bd_design $design_name 
-}
-# End of cr_bd_update_block()
-cr_bd_update_block ""
-set_property REGISTERED_WITH_MANAGER "1" [get_files update_block.bd ] 
-set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_block.bd ] 
-
-
-# Create wrapper file for update_block.bd
-make_wrapper -files [get_files update_block.bd] -import -top
-
-
-# Create wrapper file for update_kappa.bd
-make_wrapper -files [get_files update_kappa.bd] -import -top
-
 
 # Create wrapper file for update_gamma.bd
 make_wrapper -files [get_files update_gamma.bd] -import -top
-
-
-# Create wrapper file for update_feedforward.bd
-make_wrapper -files [get_files update_feedforward.bd] -import -top
-
-
-# Create wrapper file for update_epsilon.bd
-make_wrapper -files [get_files update_epsilon.bd] -import -top
 
 
 
@@ -2674,9 +2041,8 @@ proc cr_bd_update_xi { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_update_xi()
@@ -2882,9 +2248,8 @@ proc cr_bd_init_chi { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_init_chi()
@@ -3100,9 +2465,8 @@ proc cr_bd_geb_gef_update { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_geb_gef_update()
@@ -3114,71 +2478,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files geb_gef_update.bd ]
 # Create wrapper file for geb_gef_update.bd
 make_wrapper -files [get_files geb_gef_update.bd] -import -top
 
-# Set 'update_chi_inst_0' fileset object
-set obj [get_filesets update_chi_inst_0]
-# Set 'update_chi_inst_0' fileset file properties for remote files
-# None
-
-# Set 'update_chi_inst_0' fileset file properties for local files
-# None
-
-# Set 'update_chi_inst_0' fileset properties
-set obj [get_filesets update_chi_inst_0]
-set_property -name "top" -value "update_chi_inst_0" -objects $obj
-set_property -name "top_auto_set" -value "0" -objects $obj
-
-# Set 'update_epsilon_inst_0' fileset object
-set obj [get_filesets update_epsilon_inst_0]
-# Set 'update_epsilon_inst_0' fileset file properties for remote files
-# None
-
-# Set 'update_epsilon_inst_0' fileset file properties for local files
-# None
-
-# Set 'update_epsilon_inst_0' fileset properties
-set obj [get_filesets update_epsilon_inst_0]
-set_property -name "top" -value "update_epsilon_inst_0" -objects $obj
-set_property -name "top_auto_set" -value "0" -objects $obj
-
-# Set 'update_feedforward_inst_0' fileset object
-set obj [get_filesets update_feedforward_inst_0]
-# Set 'update_feedforward_inst_0' fileset file properties for remote files
-# None
-
-# Set 'update_feedforward_inst_0' fileset file properties for local files
-# None
-
-# Set 'update_feedforward_inst_0' fileset properties
-set obj [get_filesets update_feedforward_inst_0]
-set_property -name "top" -value "update_feedforward_inst_0" -objects $obj
-set_property -name "top_auto_set" -value "0" -objects $obj
-
-# Set 'update_gamma_inst_0' fileset object
-set obj [get_filesets update_gamma_inst_0]
-# Set 'update_gamma_inst_0' fileset file properties for remote files
-# None
-
-# Set 'update_gamma_inst_0' fileset file properties for local files
-# None
-
-# Set 'update_gamma_inst_0' fileset properties
-set obj [get_filesets update_gamma_inst_0]
-set_property -name "top" -value "update_gamma_inst_0" -objects $obj
-set_property -name "top_auto_set" -value "0" -objects $obj
-
-# Set 'update_kappa_inst_0' fileset object
-set obj [get_filesets update_kappa_inst_0]
-# Set 'update_kappa_inst_0' fileset file properties for remote files
-# None
-
-# Set 'update_kappa_inst_0' fileset file properties for local files
-# None
-
-# Set 'update_kappa_inst_0' fileset properties
-set obj [get_filesets update_kappa_inst_0]
-set_property -name "top" -value "update_kappa_inst_0" -objects $obj
-set_property -name "top_auto_set" -value "0" -objects $obj
-
 set idrFlowPropertiesConstraints ""
 catch {
  set idrFlowPropertiesConstraints [get_param runs.disableIDRFlowPropertyConstraints]
@@ -3187,10 +2486,10 @@ catch {
 
 # Create 'synth_1' run (if not found)
 if {[string equal [get_runs -quiet synth_1] ""]} {
-    create_run -name synth_1 -part xc7a35tcpg236-1 -flow {Vivado Synthesis 2021} -strategy "Vivado Synthesis Defaults" -report_strategy {No Reports} -constrset constrs_1
+    create_run -name synth_1 -part xc7a35tcpg236-1 -flow {Vivado Synthesis 2022} -strategy "Vivado Synthesis Defaults" -report_strategy {No Reports} -constrset constrs_1
 } else {
   set_property strategy "Vivado Synthesis Defaults" [get_runs synth_1]
-  set_property flow "Vivado Synthesis 2021" [get_runs synth_1]
+  set_property flow "Vivado Synthesis 2022" [get_runs synth_1]
 }
 set obj [get_runs synth_1]
 set_property set_report_strategy_name 1 $obj
@@ -3207,7 +2506,6 @@ if { $obj != "" } {
 set obj [get_runs synth_1]
 set_property -name "part" -value "xc7a35tcpg236-1" -objects $obj
 set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj
-set_property -name "auto_incremental_checkpoint.directory" -value "/home/valerio/phd/lavori/lsl_fpga/vivado_project/lsl_fpga.srcs/utils_1/imports/synth_1" -objects $obj
 set_property -name "strategy" -value "Vivado Synthesis Defaults" -objects $obj
 
 # set the current synth run
@@ -3215,10 +2513,10 @@ current_run -synthesis [get_runs synth_1]
 
 # Create 'impl_1' run (if not found)
 if {[string equal [get_runs -quiet impl_1] ""]} {
-    create_run -name impl_1 -part xc7a35tcpg236-1 -flow {Vivado Implementation 2021} -strategy "Vivado Implementation Defaults" -report_strategy {No Reports} -constrset constrs_1 -parent_run synth_1
+    create_run -name impl_1 -part xc7a35tcpg236-1 -flow {Vivado Implementation 2022} -strategy "Vivado Implementation Defaults" -report_strategy {No Reports} -constrset constrs_1 -parent_run synth_1
 } else {
   set_property strategy "Vivado Implementation Defaults" [get_runs impl_1]
-  set_property flow "Vivado Implementation 2021" [get_runs impl_1]
+  set_property flow "Vivado Implementation 2022" [get_runs impl_1]
 }
 set obj [get_runs impl_1]
 set_property set_report_strategy_name 1 $obj
@@ -3430,8 +2728,6 @@ set_property -name "options.warn_on_violation" -value "1" -objects $obj
 }
 set obj [get_runs impl_1]
 set_property -name "part" -value "xc7a35tcpg236-1" -objects $obj
-set_property -name "auto_rqs.directory" -value "/home/valerio/code/fpga/lsl_fpga/vivado_project/lsl_fpga.srcs/utils_1/imports/impl_1" -objects $obj
-set_property -name "auto_incremental_checkpoint.directory" -value "/home/valerio/code/fpga/lsl_fpga/vivado_project/lsl_fpga.srcs/utils_1/imports/impl_1" -objects $obj
 set_property -name "strategy" -value "Vivado Implementation Defaults" -objects $obj
 set_property -name "steps.write_bitstream.args.readback_file" -value "0" -objects $obj
 set_property -name "steps.write_bitstream.args.verbose" -value "0" -objects $obj
