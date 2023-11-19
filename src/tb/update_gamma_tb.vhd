@@ -37,7 +37,7 @@ architecture behavioral of tb is
     constant normalization: signed := to_signed(1024, 18);
 
     constant betageb: signed := signed(geb_val)*signed(beta_val)*normalization;
-    constant gam_result: std_logic_vector := std_logic_vector(signed(gam_val) - betageb(47 downto 30));
+    constant gam_result: std_logic_vector := std_logic_vector(signed(gam_val) - betageb(frac_len*2 + word_len - 1 downto frac_len*2));
 
 begin
 

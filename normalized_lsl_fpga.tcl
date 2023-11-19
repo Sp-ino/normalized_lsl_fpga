@@ -167,7 +167,7 @@ set_property -name "webtalk.riviera_export_sim" -value "46" -objects $obj
 set_property -name "webtalk.vcs_export_sim" -value "46" -objects $obj
 set_property -name "webtalk.xcelium_export_sim" -value "2" -objects $obj
 set_property -name "webtalk.xsim_export_sim" -value "46" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "499" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "506" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -258,7 +258,6 @@ set file "$origin_dir/src/lsl_core.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
-set_property -name "is_enabled" -value "0" -objects $file_obj
 
 
 # Set 'sources_1' fileset file properties for local files

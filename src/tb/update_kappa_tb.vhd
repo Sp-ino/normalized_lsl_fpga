@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.math_real.all;
 
 library xil_defaultlib;
 use xil_defaultlib.dsp_pkg.all;
@@ -60,12 +61,12 @@ architecture behavioral of tb is
     constant xib_val: std_logic_vector := b"000010000000111100";
     constant xif_val: std_logic_vector := b"000010101000111111";
 
-    constant gef_over_xif: signed := signed(gef_val)/signed(xif_val);
+    constant gef_over_xif: signed := to_signed(integer(32768.0*real(to_integer(signed(gef_val)))/real(to_integer(signed(xif_val)))), 18);
     constant gefxifeb: signed := signed(e_val)*gef_over_xif(word_len - 1 downto 0);
     constant kb_result: signed := signed(kb_val) + gefxifeb(word_len - 1 downto 0);
 
     constant betaef: signed := signed(e_val)*signed(beta_val);
-    constant kf_result: signed := signed(kf_val) + betaef(word_len - 1 downto 0);
+    constant kf_result: signed := signed(kf_val) + betaef(frac_len + word_len - 1 downto frac_len);
 
 begin
 
@@ -103,7 +104,7 @@ begin
     begin
 
         wait for 2*tck;
-        sel <= '1';
+        sel <= '0';
         valid <= '1';
         kb <= kb_val;
         kf <= kf_val;
