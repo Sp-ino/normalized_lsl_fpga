@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="139.022 ns"></ZoomStartTime>
-      <ZoomEndTime time="212.196 ns"></ZoomEndTime>
+      <ZoomStartTime time="34.497 ns"></ZoomStartTime>
+      <ZoomEndTime time="91.961 ns"></ZoomEndTime>
       <Cursor1Time time="200.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="424"></NameColumnWidth>
       <ValueColumnWidth column_width="205"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="20" />
+   <WVObjectSize size="25" />
    <wvobject fp_name="/tb/sel" type="logic">
       <obj_property name="ElementShortName">sel</obj_property>
       <obj_property name="ObjectShortName">sel</obj_property>
@@ -138,11 +138,11 @@
       <obj_property name="radix_otherWidth">0</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/gefxifeb" type="array">
-      <obj_property name="ElementShortName">gefxifeb[35:0]</obj_property>
-      <obj_property name="ObjectShortName">gefxifeb[35:0]</obj_property>
+      <obj_property name="ElementShortName">gefxifeb[53:0]</obj_property>
+      <obj_property name="ObjectShortName">gefxifeb[53:0]</obj_property>
       <obj_property name="Radix">REALRADIX</obj_property>
       <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
-      <obj_property name="radix_fractionWidth">30</obj_property>
+      <obj_property name="radix_fractionWidth">45</obj_property>
       <obj_property name="radix_otherWidth">0</obj_property>
    </wvobject>
    <wvobject fp_name="/tb/kb_result" type="array">
@@ -164,6 +164,46 @@
    <wvobject fp_name="/tb/kf_result" type="array">
       <obj_property name="ElementShortName">kf_result[17:0]</obj_property>
       <obj_property name="ObjectShortName">kf_result[17:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/dut/gefxifeb/A" type="array">
+      <obj_property name="ElementShortName">A[17:0]</obj_property>
+      <obj_property name="ObjectShortName">A[17:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/dut/gefxifeb/B" type="array">
+      <obj_property name="ElementShortName">B[17:0]</obj_property>
+      <obj_property name="ObjectShortName">B[17:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/dut/gefxifeb/P" type="array">
+      <obj_property name="ElementShortName">P[35:0]</obj_property>
+      <obj_property name="ObjectShortName">P[35:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">30</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/dut/normalize_0/o_data" type="array">
+      <obj_property name="ElementShortName">o_data[17:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data[17:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/gefxifeb_normalized" type="array">
+      <obj_property name="ElementShortName">gefxifeb_normalized[47:30]</obj_property>
+      <obj_property name="ObjectShortName">gefxifeb_normalized[47:30]</obj_property>
       <obj_property name="Radix">REALRADIX</obj_property>
       <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
       <obj_property name="radix_fractionWidth">15</obj_property>
