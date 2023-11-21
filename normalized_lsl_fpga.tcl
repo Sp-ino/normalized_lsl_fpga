@@ -168,7 +168,7 @@ set_property -name "webtalk.riviera_export_sim" -value "47" -objects $obj
 set_property -name "webtalk.vcs_export_sim" -value "47" -objects $obj
 set_property -name "webtalk.xcelium_export_sim" -value "3" -objects $obj
 set_property -name "webtalk.xsim_export_sim" -value "47" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "552" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "561" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -806,12 +806,6 @@ make_wrapper -files [get_files update_xi.bd] -import -top
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
 if { [get_files delay.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
 }
@@ -830,8 +824,8 @@ if { [get_files mux.vhd] == "" } {
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
 }
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
 }
 if { [get_files dsp_pkg.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
@@ -839,13 +833,19 @@ if { [get_files dsp_pkg.vhd] == "" } {
 if { [get_files normalize.vhd] == "" } {
   import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
 }
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
 
 
 # Proc to create BD update_kappa
 proc cr_bd_update_kappa { parentCell } {
 # The design that will be created by this Tcl proc contains the following 
 # module references:
-# c_port_resizer, delay, mux, mux, normalize, postmul_resizer_wideinput
+# delay, delay, mux, mux, normalize, normalize
 
 
 
@@ -895,12 +895,12 @@ proc cr_bd_update_kappa { parentCell } {
   set bCheckModules 1
   if { $bCheckModules == 1 } {
      set list_check_mods "\ 
-  c_port_resizer\
+  delay\
   delay\
   mux\
   mux\
   normalize\
-  postmul_resizer_wideinput\
+  normalize\
   "
 
    set list_mods_missing ""
@@ -970,39 +970,27 @@ proc cr_bd_update_kappa { parentCell } {
   set xib_m1 [ create_bd_port -dir I -from 17 -to 0 xib_m1 ]
   set xif_m [ create_bd_port -dir I -from 17 -to 0 xif_m ]
 
-  # Create instance: betaef_plus_kf1, and set properties
-  set betaef_plus_kf1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 betaef_plus_kf1 ]
+  # Create instance: betaef, and set properties
+  set betaef [ create_bd_cell -type ip -vlnv xilinx.com:ip:dsp_macro:1.0 betaef ]
   set_property -dict [ list \
    CONFIG.areg_1 {false} \
-   CONFIG.areg_2 {false} \
-   CONFIG.areg_3 {false} \
-   CONFIG.areg_4 {false} \
-   CONFIG.breg_1 {false} \
-   CONFIG.breg_2 {false} \
+   CONFIG.areg_2 {true} \
+   CONFIG.areg_3 {true} \
+   CONFIG.areg_4 {true} \
    CONFIG.breg_3 {false} \
-   CONFIG.breg_4 {true} \
-   CONFIG.c_binarywidth {0} \
-   CONFIG.c_width {36} \
-   CONFIG.creg_1 {false} \
-   CONFIG.creg_2 {false} \
+   CONFIG.breg_4 {false} \
    CONFIG.creg_3 {false} \
-   CONFIG.creg_4 {true} \
-   CONFIG.creg_5 {true} \
-   CONFIG.instruction1 {A*B+C} \
+   CONFIG.creg_4 {false} \
+   CONFIG.creg_5 {false} \
+   CONFIG.instruction1 {A*B} \
    CONFIG.mreg_5 {true} \
    CONFIG.output_properties {Full_Precision} \
    CONFIG.p_binarywidth {0} \
-   CONFIG.p_full_width {37} \
-   CONFIG.p_width {37} \
+   CONFIG.p_full_width {36} \
+   CONFIG.p_width {36} \
    CONFIG.pipeline_options {Expert} \
-   CONFIG.preg_6 {true} \
-   CONFIG.tier_1 {false} \
-   CONFIG.tier_2 {false} \
-   CONFIG.tier_3 {false} \
-   CONFIG.tier_4 {false} \
-   CONFIG.tier_5 {false} \
-   CONFIG.tier_6 {false} \
- ] $betaef_plus_kf1
+   CONFIG.preg_6 {false} \
+ ] $betaef
 
   # Create instance: c_addsub_0, and set properties
   set c_addsub_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 c_addsub_0 ]
@@ -1015,17 +1003,17 @@ proc cr_bd_update_kappa { parentCell } {
    CONFIG.Out_Width {18} \
  ] $c_addsub_0
 
-  # Create instance: c_port_resizer_0, and set properties
-  set block_name c_port_resizer
-  set block_cell_name c_port_resizer_0
-  if { [catch {set c_port_resizer_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   } elseif { $c_port_resizer_0 eq "" } {
-     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
-     return 1
-   }
-  
+  # Create instance: c_addsub_1, and set properties
+  set c_addsub_1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 c_addsub_1 ]
+  set_property -dict [ list \
+   CONFIG.A_Width {18} \
+   CONFIG.B_Value {000000000000000000} \
+   CONFIG.B_Width {18} \
+   CONFIG.CE {false} \
+   CONFIG.Latency {0} \
+   CONFIG.Out_Width {18} \
+ ] $c_addsub_1
+
   # Create instance: delay_0, and set properties
   set block_name delay
   set block_cell_name delay_0
@@ -1039,6 +1027,20 @@ proc cr_bd_update_kappa { parentCell } {
     set_property -dict [ list \
    CONFIG.delay_len {5} \
  ] $delay_0
+
+  # Create instance: delay_1, and set properties
+  set block_name delay
+  set block_cell_name delay_1
+  if { [catch {set delay_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   } elseif { $delay_1 eq "" } {
+     catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
+     return 1
+   }
+    set_property -dict [ list \
+   CONFIG.delay_len {4} \
+ ] $delay_1
 
   # Create instance: gef_over_xif_or_beta_m1, and set properties
   set gef_over_xif_or_beta_m1 [ create_bd_cell -type ip -vlnv xilinx.com:ip:div_gen:5.1 gef_over_xif_or_beta_m1 ]
@@ -1107,13 +1109,13 @@ proc cr_bd_update_kappa { parentCell } {
      return 1
    }
   
-  # Create instance: postmul_resizer_wide_0, and set properties
-  set block_name postmul_resizer_wideinput
-  set block_cell_name postmul_resizer_wide_0
-  if { [catch {set postmul_resizer_wide_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+  # Create instance: normalize_1, and set properties
+  set block_name normalize
+  set block_cell_name normalize_1
+  if { [catch {set normalize_1 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
      catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
      return 1
-   } elseif { $postmul_resizer_wide_0 eq "" } {
+   } elseif { $normalize_1 eq "" } {
      catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
      return 1
    }
@@ -1128,15 +1130,16 @@ proc cr_bd_update_kappa { parentCell } {
 
   # Create port connections
   connect_bd_net -net Kb1_m_1 [get_bd_ports Kb1_m] [get_bd_pins delay_0/i_data]
-  connect_bd_net -net Kf1_m_1 [get_bd_ports Kf1_m] [get_bd_pins c_port_resizer_0/i_data]
-  connect_bd_net -net beta1_m_1 [get_bd_ports beta1_m] [get_bd_pins betaef_plus_kf1/B]
-  connect_bd_net -net betaef_plus_kf1_P [get_bd_pins betaef_plus_kf1/P] [get_bd_pins postmul_resizer_wide_0/i_data]
+  connect_bd_net -net Kf1_m_1 [get_bd_ports Kf1_m] [get_bd_pins delay_1/i_data]
+  connect_bd_net -net beta1_m_1 [get_bd_ports beta1_m] [get_bd_pins betaef/B]
+  connect_bd_net -net betaef_P [get_bd_pins betaef/P] [get_bd_pins normalize_1/i_data]
   connect_bd_net -net c_addsub_0_S [get_bd_ports Kb_m] [get_bd_pins c_addsub_0/S]
-  connect_bd_net -net c_port_resizer_0_o_data [get_bd_pins betaef_plus_kf1/C] [get_bd_pins c_port_resizer_0/o_data]
-  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins betaef_plus_kf1/CLK] [get_bd_pins delay_0/i_ck] [get_bd_pins gef_over_xif_or_beta_m1/aclk] [get_bd_pins gefxifeb/CLK]
+  connect_bd_net -net c_addsub_1_S [get_bd_ports Kf_m] [get_bd_pins c_addsub_1/S]
+  connect_bd_net -net ck_1 [get_bd_ports ck] [get_bd_pins betaef/CLK] [get_bd_pins delay_0/i_ck] [get_bd_pins delay_1/i_ck] [get_bd_pins gef_over_xif_or_beta_m1/aclk] [get_bd_pins gefxifeb/CLK]
   connect_bd_net -net delay_0_o_data [get_bd_pins c_addsub_0/B] [get_bd_pins delay_0/o_data]
+  connect_bd_net -net delay_1_o_data [get_bd_pins c_addsub_1/B] [get_bd_pins delay_1/o_data]
   connect_bd_net -net eb_m1_1 [get_bd_ports eb_m1] [get_bd_pins gefxifeb/A]
-  connect_bd_net -net ef_m1_1 [get_bd_ports ef_m1] [get_bd_pins betaef_plus_kf1/A]
+  connect_bd_net -net ef_m1_1 [get_bd_ports ef_m1] [get_bd_pins betaef/A]
   connect_bd_net -net geb_m1_1 [get_bd_ports geb_m1] [get_bd_pins mux_1/d1]
   connect_bd_net -net gef_m_1 [get_bd_ports gef_m] [get_bd_pins mux_1/d0]
   connect_bd_net -net gef_over_xif_or_beta_m1_m_axis_dout_tdata [get_bd_pins gef_over_xif_or_beta_m1/m_axis_dout_tdata] [get_bd_pins xlslice_0/Din]
@@ -1144,7 +1147,7 @@ proc cr_bd_update_kappa { parentCell } {
   connect_bd_net -net mux_0_s [get_bd_pins gef_over_xif_or_beta_m1/s_axis_divisor_tdata] [get_bd_pins mux_0/s]
   connect_bd_net -net mux_1_s [get_bd_pins gef_over_xif_or_beta_m1/s_axis_dividend_tdata] [get_bd_pins mux_1/s]
   connect_bd_net -net normalize_0_o_data [get_bd_pins c_addsub_0/A] [get_bd_pins normalize_0/o_data]
-  connect_bd_net -net postmul_resizer_wide_0_o_data [get_bd_ports Kf_m] [get_bd_pins postmul_resizer_wide_0/o_data]
+  connect_bd_net -net normalize_1_o_data [get_bd_pins c_addsub_1/A] [get_bd_pins normalize_1/o_data]
   connect_bd_net -net sel_1 [get_bd_ports sel] [get_bd_pins mux_0/sel] [get_bd_pins mux_1/sel]
   connect_bd_net -net valid_1 [get_bd_ports valid] [get_bd_pins gef_over_xif_or_beta_m1/s_axis_dividend_tvalid] [get_bd_pins gef_over_xif_or_beta_m1/s_axis_divisor_tvalid]
   connect_bd_net -net xib_m1_1 [get_bd_ports xib_m1] [get_bd_pins mux_0/d1]

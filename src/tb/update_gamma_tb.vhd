@@ -64,7 +64,7 @@ begin
     test_sig: process
     begin
 
-        wait for 2*tck;
+        wait for tck/2;
         geb <= geb_val;
         beta <= beta_val;
         gam <= gam_val;
@@ -72,7 +72,8 @@ begin
         wait for tck;
 
         assert gam_out = gam_result report "incorrect output on gamma" severity error;
-
+        wait for tck/2;
+        
     end process test_sig;
 
 

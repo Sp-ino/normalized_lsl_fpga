@@ -65,11 +65,10 @@ architecture behavioral of tb is
 
     constant gef_over_xif: signed := to_signed(integer(32768.0*real(to_integer(signed(gef_val)))/real(to_integer(signed(xif_val)))), 18);
     constant gefxifeb: signed := normalization*signed(e_val)*(gef_over_xif(word_len - 1 downto 0));
-    constant gefxifeb_normalized: signed := gefxifeb(2*frac_len + word_len - 1 downto 2*frac_len);
-    constant kb_result: std_logic_vector := std_logic_vector(signed(kb_val) + gefxifeb_normalized);
+    constant kb_result: std_logic_vector := std_logic_vector(signed(kb_val) + gefxifeb(2*frac_len + word_len - 1 downto 2*frac_len));
 
-    constant betaef: signed := signed(e_val)*signed(beta_val);
-    constant kf_result: std_logic_vector := std_logic_vector(signed(kf_val) + betaef(frac_len + word_len - 1 downto frac_len));
+    constant betaef: signed := normalization*signed(e_val)*signed(beta_val);
+    constant kf_result: std_logic_vector := std_logic_vector(signed(kf_val) + betaef(2*frac_len + word_len - 1 downto 2*frac_len));
 
     constant beta_result: std_logic_vector := std_logic_vector(to_signed(integer(32768.0*real(to_integer(signed(geb_val)))/real(to_integer(signed(xib_val)))), 18));
 
@@ -135,8 +134,8 @@ begin
         wait for 3*tck;
 
         assert beta_result = beta_out report "incorrect output on beta" severity error;
-
         wait for tck/2;
+
     end process test_sig;
 
 end behavioral;
