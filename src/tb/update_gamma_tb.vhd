@@ -71,7 +71,7 @@ begin
         
         wait for tck;
 
-        assert gam_out = gam_result report "Incorrect result: test failed" severity error;
+        assert gam_out = gam_result report "incorrect output on gamma" severity error;
 
     end process test_sig;
 

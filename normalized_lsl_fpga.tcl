@@ -35,6 +35,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/wave_config/tb_behav_gamma.wcfg"]"\
  "[file normalize "$origin_dir/src/tb/update_epsilon_tb.vhd"]"\
  "[file normalize "$origin_dir/src/tb/update_kappa_tb.vhd"]"\
+ "[file normalize "$origin_dir/src/wave_config/tb_behav_kappa.wcfg"]"\
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -167,7 +168,7 @@ set_property -name "webtalk.riviera_export_sim" -value "47" -objects $obj
 set_property -name "webtalk.vcs_export_sim" -value "47" -objects $obj
 set_property -name "webtalk.xcelium_export_sim" -value "3" -objects $obj
 set_property -name "webtalk.xsim_export_sim" -value "47" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "538" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "552" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -361,6 +362,7 @@ if {[string equal [get_filesets -quiet test_kappa_update] ""]} {
 set obj [get_filesets test_kappa_update]
 set files [list \
  [file normalize "${origin_dir}/src/tb/update_kappa_tb.vhd"] \
+ [file normalize "${origin_dir}/src/wave_config/tb_behav_kappa.wcfg"] \
 ]
 add_files -norecurse -fileset $obj $files
 
