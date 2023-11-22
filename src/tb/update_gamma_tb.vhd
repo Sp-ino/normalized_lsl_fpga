@@ -16,10 +16,10 @@ architecture behavioral of tb is
     component update_gamma is
         port (
             ck : in std_logic;
-            beta_m : in std_logic_vector ( 17 downto 0 );
-            geb_m : in std_logic_vector ( 17 downto 0 );
-            gam_m : in std_logic_vector ( 17 downto 0 );
-            gam_m1 : out std_logic_vector ( 17 downto 0 )
+            beta_m : in std_logic_vector (word_len - 1 downto 0);
+            geb_m : in std_logic_vector (word_len - 1 downto 0);
+            gam_m : in std_logic_vector (word_len - 1 downto 0);
+            gam_m1 : out std_logic_vector (word_len - 1 downto 0)
         );
     end component;
 
@@ -34,9 +34,7 @@ architecture behavioral of tb is
     constant beta_val: std_logic_vector := b"000110000000001011";
     constant gam_val: std_logic_vector := b"000110000000001011";
     
-    constant normalization: signed := to_signed(1024, 18);
-
-    constant betageb: signed := signed(geb_val)*signed(beta_val)*normalization;
+    constant betageb: signed := signed(geb_val)*signed(beta_val)*signed(normalization);
     constant gam_result: std_logic_vector := std_logic_vector(signed(gam_val) - betageb(frac_len*2 + word_len - 1 downto frac_len*2));
 
 begin
@@ -73,7 +71,7 @@ begin
 
         assert gam_out = gam_result report "incorrect output on gamma" severity error;
         wait for tck/2;
-        
+
     end process test_sig;
 
 

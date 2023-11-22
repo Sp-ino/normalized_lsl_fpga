@@ -19,18 +19,18 @@ architecture behavioral of tb is
             ck : in std_logic;
             sel: in std_logic;
             valid: in std_logic;
-            ef_m1 : in std_logic_vector (17 downto 0);
-            eb_m1 : in std_logic_vector (17 downto 0);
-            beta1_m : in std_logic_vector (17 downto 0);
-            Kf1_m : in std_logic_vector (17 downto 0);
-            Kb1_m : in std_logic_vector (17 downto 0);
-            xif_m : in std_logic_vector (17 downto 0);
-            xib_m1 : in std_logic_vector (17 downto 0);
-            gef_m : in std_logic_vector (17 downto 0);
-            geb_m1 : in std_logic_vector (17 downto 0);
-            Kf_m : out std_logic_vector (17 downto 0);
-            Kb_m : out std_logic_vector (17 downto 0);
-            beta_m1: out std_logic_vector (17 downto 0)
+            ef_m1 : in std_logic_vector (word_len - 1 downto 0);
+            eb_m1 : in std_logic_vector (word_len - 1 downto 0);
+            beta1_m : in std_logic_vector (word_len - 1 downto 0);
+            Kf1_m : in std_logic_vector (word_len - 1 downto 0);
+            Kb1_m : in std_logic_vector (word_len - 1 downto 0);
+            xif_m : in std_logic_vector (word_len - 1 downto 0);
+            xib_m1 : in std_logic_vector (word_len - 1 downto 0);
+            gef_m : in std_logic_vector (word_len - 1 downto 0);
+            geb_m1 : in std_logic_vector (word_len - 1 downto 0);
+            Kf_m : out std_logic_vector (word_len - 1 downto 0);
+            Kb_m : out std_logic_vector (word_len - 1 downto 0);
+            beta_m1: out std_logic_vector (word_len - 1 downto 0)
         );
     end component;
 
@@ -61,13 +61,11 @@ architecture behavioral of tb is
     constant xib_val: std_logic_vector := b"000010000000111100";
     constant xif_val: std_logic_vector := b"000010101000111111";
 
-    constant normalization: signed := to_signed(1024, 18);
-
     constant gef_over_xif: signed := to_signed(integer(32768.0*real(to_integer(signed(gef_val)))/real(to_integer(signed(xif_val)))), 18);
-    constant gefxifeb: signed := normalization*signed(e_val)*(gef_over_xif(word_len - 1 downto 0));
+    constant gefxifeb: signed := signed(normalization)*signed(e_val)*(gef_over_xif(word_len - 1 downto 0));
     constant kb_result: std_logic_vector := std_logic_vector(signed(kb_val) + gefxifeb(2*frac_len + word_len - 1 downto 2*frac_len));
 
-    constant betaef: signed := normalization*signed(e_val)*signed(beta_val);
+    constant betaef: signed := signed(normalization)*signed(e_val)*signed(beta_val);
     constant kf_result: std_logic_vector := std_logic_vector(signed(kf_val) + betaef(2*frac_len + word_len - 1 downto 2*frac_len));
 
     constant beta_result: std_logic_vector := std_logic_vector(to_signed(integer(32768.0*real(to_integer(signed(geb_val)))/real(to_integer(signed(xib_val)))), 18));
