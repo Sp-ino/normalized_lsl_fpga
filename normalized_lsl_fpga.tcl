@@ -22,13 +22,13 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/dsp_pkg.vhd"]"\
  "[file normalize "$origin_dir/../lsl_fpga/src/update_slice.vhd"]"\
  "[file normalize "$origin_dir/src/lsl_core.vhd"]"\
+ "[file normalize "$origin_dir/src/update_slice.vhd"]"\
  "[file normalize "$origin_dir/src/postmul_resizer.vhd"]"\
  "[file normalize "$origin_dir/src/c_port_resizer.vhd"]"\
  "[file normalize "$origin_dir/src/delay.vhd"]"\
  "[file normalize "$origin_dir/src/mux.vhd"]"\
  "[file normalize "$origin_dir/src/postmul_resizer_wideinput.vhd"]"\
  "[file normalize "$origin_dir/src/normalize.vhd"]"\
- "[file normalize "$origin_dir/src/update_slice.vhd"]"\
  "[file normalize "$origin_dir/src/divider.vhd"]"\
  "[file normalize "$origin_dir/vivado_project/normalized_lsl_fpga.srcs/sources_1/imports/hdl/init_chi_wrapper.vhd"]"\
  "[file normalize "$origin_dir/src/scalar_delay.vhd"]"\
@@ -40,6 +40,8 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/wave_config/tb_behav_kappa.wcfg"]"\
  "[file normalize "$origin_dir/src/tb/update_xi_tb.vhd"]"\
  "[file normalize "$origin_dir/src/wave_config/tb_behav_xi.wcfg"]"\
+ "[file normalize "$origin_dir/src/tb/update_feedforward_tb.vhd"]"\
+ "[file normalize "$origin_dir/src/wave_config/tb_behav_feedforward.wcfg"]"\
   ]
   foreach ifile $files {
     if { ![file isfile $ifile] } {
@@ -163,17 +165,16 @@ set_property -name "simulator.xcelium_version" -value "21.09.002" -objects $obj
 set_property -name "simulator.xsim_gcc_version" -value "6.2.0" -objects $obj
 set_property -name "simulator.xsim_version" -value "2022.1" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
-set_property -name "source_mgmt_mode" -value "DisplayOnly" -objects $obj
 set_property -name "target_language" -value "VHDL" -objects $obj
-set_property -name "webtalk.activehdl_export_sim" -value "55" -objects $obj
+set_property -name "webtalk.activehdl_export_sim" -value "57" -objects $obj
 set_property -name "webtalk.ies_export_sim" -value "30" -objects $obj
-set_property -name "webtalk.modelsim_export_sim" -value "55" -objects $obj
-set_property -name "webtalk.questa_export_sim" -value "55" -objects $obj
-set_property -name "webtalk.riviera_export_sim" -value "55" -objects $obj
-set_property -name "webtalk.vcs_export_sim" -value "55" -objects $obj
-set_property -name "webtalk.xcelium_export_sim" -value "8" -objects $obj
-set_property -name "webtalk.xsim_export_sim" -value "55" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "601" -objects $obj
+set_property -name "webtalk.modelsim_export_sim" -value "57" -objects $obj
+set_property -name "webtalk.questa_export_sim" -value "57" -objects $obj
+set_property -name "webtalk.riviera_export_sim" -value "57" -objects $obj
+set_property -name "webtalk.vcs_export_sim" -value "57" -objects $obj
+set_property -name "webtalk.xcelium_export_sim" -value "1" -objects $obj
+set_property -name "webtalk.xsim_export_sim" -value "57" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "621" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -187,13 +188,13 @@ set files [list \
  [file normalize "${origin_dir}/src/dsp_pkg.vhd"] \
  [file normalize "${origin_dir}/../lsl_fpga/src/update_slice.vhd"] \
  [file normalize "${origin_dir}/src/lsl_core.vhd"] \
+ [file normalize "${origin_dir}/src/update_slice.vhd"] \
  [file normalize "${origin_dir}/src/postmul_resizer.vhd"] \
  [file normalize "${origin_dir}/src/c_port_resizer.vhd"] \
  [file normalize "${origin_dir}/src/delay.vhd"] \
  [file normalize "${origin_dir}/src/mux.vhd"] \
  [file normalize "${origin_dir}/src/postmul_resizer_wideinput.vhd"] \
  [file normalize "${origin_dir}/src/normalize.vhd"] \
- [file normalize "${origin_dir}/src/update_slice.vhd"] \
  [file normalize "${origin_dir}/src/divider.vhd"] \
  [file normalize "${origin_dir}/vivado_project/normalized_lsl_fpga.srcs/sources_1/imports/hdl/init_chi_wrapper.vhd"] \
  [file normalize "${origin_dir}/src/scalar_delay.vhd"] \
@@ -217,6 +218,11 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "$origin_dir/src/lsl_core.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
+set file "$origin_dir/src/update_slice.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
@@ -247,11 +253,6 @@ set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
 
 set file "$origin_dir/src/normalize.vhd"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "VHDL" -objects $file_obj
-
-set file "$origin_dir/src/update_slice.vhd"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
 set_property -name "file_type" -value "VHDL" -objects $file_obj
@@ -424,6 +425,35 @@ set_property -name "top" -value "tb" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
+# Create 'test_feedforward_update' fileset (if not found)
+if {[string equal [get_filesets -quiet test_feedforward_update] ""]} {
+  create_fileset -simset test_feedforward_update
+}
+
+# Set 'test_feedforward_update' fileset object
+set obj [get_filesets test_feedforward_update]
+set files [list \
+ [file normalize "${origin_dir}/src/tb/update_feedforward_tb.vhd"] \
+ [file normalize "${origin_dir}/src/wave_config/tb_behav_feedforward.wcfg"] \
+]
+add_files -norecurse -fileset $obj $files
+
+# Set 'test_feedforward_update' fileset file properties for remote files
+set file "$origin_dir/src/tb/update_feedforward_tb.vhd"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets test_feedforward_update] [list "*$file"]]
+set_property -name "file_type" -value "VHDL" -objects $file_obj
+
+
+# Set 'test_feedforward_update' fileset file properties for local files
+# None
+
+# Set 'test_feedforward_update' fileset properties
+set obj [get_filesets test_feedforward_update]
+set_property -name "top" -value "tb" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
+set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
+
 # Set 'utils_1' fileset object
 set obj [get_filesets utils_1]
 # Empty (no sources present)
@@ -558,6 +588,18 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files divider_test.bd ]
 # Create wrapper file for divider_test.bd
 make_wrapper -files [get_files divider_test.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
 
 
 # Proc to create BD update_xi
@@ -831,6 +873,42 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_xi.bd ]
 # Create wrapper file for update_xi.bd
 make_wrapper -files [get_files update_xi.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files mux.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
 
 
 # Proc to create BD update_kappa
@@ -1165,6 +1243,12 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_kappa.bd ]
 # Create wrapper file for update_kappa.bd
 make_wrapper -files [get_files update_kappa.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
 
 
 # Proc to create BD update_gamma
@@ -1368,13 +1452,67 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_gamma.bd ]
 # Create wrapper file for update_gamma.bd
 make_wrapper -files [get_files update_gamma.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files delay.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
+}
 
 
 # Proc to create BD update_feedforward
 proc cr_bd_update_feedforward { parentCell } {
 # The design that will be created by this Tcl proc contains the following 
 # module references:
-# c_port_resizer, c_port_resizer, delay, delay, delay, normalize, postmul_resizer_wideinput, postmul_resizer_wideinput, postmul_resizer_wideinput
+# c_port_resizer, c_port_resizer, delay, delay, delay, normalize, postmul_resizer, postmul_resizer_wideinput, postmul_resizer_wideinput
 
 
 
@@ -1428,7 +1566,7 @@ proc cr_bd_update_feedforward { parentCell } {
   delay\
   delay\
   normalize\
-  postmul_resizer_wideinput\
+  postmul_resizer\
   postmul_resizer_wideinput\
   postmul_resizer_wideinput\
   "
@@ -1600,7 +1738,7 @@ proc cr_bd_update_feedforward { parentCell } {
    CONFIG.B_Width {36} \
    CONFIG.CE {false} \
    CONFIG.Latency {1} \
-   CONFIG.Out_Width {37} \
+   CONFIG.Out_Width {36} \
  ] $e_minus_veb
 
   # Create instance: normalize_0, and set properties
@@ -1614,13 +1752,13 @@ proc cr_bd_update_feedforward { parentCell } {
      return 1
    }
   
-  # Create instance: postmul_resizer_wide_0, and set properties
-  set block_name postmul_resizer_wideinput
-  set block_cell_name postmul_resizer_wide_0
-  if { [catch {set postmul_resizer_wide_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
+  # Create instance: postmul_resizer_0, and set properties
+  set block_name postmul_resizer
+  set block_cell_name postmul_resizer_0
+  if { [catch {set postmul_resizer_0 [create_bd_cell -type module -reference $block_name $block_cell_name] } errmsg] } {
      catch {common::send_gid_msg -ssname BD::TCL -id 2095 -severity "ERROR" "Unable to add referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
      return 1
-   } elseif { $postmul_resizer_wide_0 eq "" } {
+   } elseif { $postmul_resizer_0 eq "" } {
      catch {common::send_gid_msg -ssname BD::TCL -id 2096 -severity "ERROR" "Unable to referenced block <$block_name>. Please add the files for ${block_name}'s definition into the project."}
      return 1
    }
@@ -1651,7 +1789,6 @@ proc cr_bd_update_feedforward { parentCell } {
   set v1_plus_betae [ create_bd_cell -type ip -vlnv xilinx.com:ip:c_addsub:12.0 v1_plus_betae ]
   set_property -dict [ list \
    CONFIG.A_Width {18} \
-   CONFIG.Add_Mode {Subtract} \
    CONFIG.B_Value {000000000000000000} \
    CONFIG.B_Width {18} \
    CONFIG.CE {false} \
@@ -1711,15 +1848,15 @@ proc cr_bd_update_feedforward { parentCell } {
   connect_bd_net -net delay_24_o_data [get_bd_pins c_port_resizer_2/i_data] [get_bd_pins delay_24/o_data]
   connect_bd_net -net delay_25_o_data [get_bd_ports e_m1] [get_bd_pins delay_25/o_data]
   connect_bd_net -net e_m_1 [get_bd_ports e_m] [get_bd_pins delay_22/i_data]
-  connect_bd_net -net e_minus_veb_S [get_bd_pins e_minus_veb/S] [get_bd_pins postmul_resizer_wide_0/i_data] [get_bd_pins postmul_resizer_wide_3/i_data]
+  connect_bd_net -net e_minus_veb_S [get_bd_pins e_minus_veb/S] [get_bd_pins postmul_resizer_0/i_data] [get_bd_pins postmul_resizer_wide_3/i_data]
   connect_bd_net -net eb_m_2 [get_bd_ports eb_m] [get_bd_pins veb/B]
   connect_bd_net -net normalize_0_o_data [get_bd_pins normalize_0/o_data] [get_bd_pins v1_plus_betae/B]
-  connect_bd_net -net postmul_resizer_wide_0_o_data [get_bd_pins betae/B] [get_bd_pins postmul_resizer_wide_0/o_data]
+  connect_bd_net -net postmul_resizer_0_o_data [get_bd_pins betae/B] [get_bd_pins postmul_resizer_0/o_data]
   connect_bd_net -net postmul_resizer_wide_2_o_data [get_bd_ports ys_m1] [get_bd_pins postmul_resizer_wide_2/o_data]
   connect_bd_net -net postmul_resizer_wide_3_o_data [get_bd_pins delay_25/i_data] [get_bd_pins postmul_resizer_wide_3/o_data]
   connect_bd_net -net v1_m_1 [get_bd_ports v1_m] [get_bd_pins v1_plus_betae/A] [get_bd_pins veb/A]
+  connect_bd_net -net v1_plus_betae_S [get_bd_ports v_m] [get_bd_pins v1_plus_betae/S]
   connect_bd_net -net veb_P [get_bd_pins e_minus_veb/B] [get_bd_pins veb/P] [get_bd_pins ys_plus_veb/A]
-  connect_bd_net -net xif_m1_S [get_bd_ports v_m] [get_bd_pins v1_plus_betae/S]
   connect_bd_net -net ys_m_1 [get_bd_ports ys_m] [get_bd_pins delay_24/i_data]
   connect_bd_net -net ys_plus_veb_S [get_bd_pins postmul_resizer_wide_2/i_data] [get_bd_pins ys_plus_veb/S]
 
@@ -1742,6 +1879,30 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_feedforward.
 # Create wrapper file for update_feedforward.bd
 make_wrapper -files [get_files update_feedforward.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files c_port_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer_wideinput.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
+}
 
 
 # Proc to create BD update_epsilon
@@ -1996,6 +2157,18 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_epsilon.bd ]
 # Create wrapper file for update_epsilon.bd
 make_wrapper -files [get_files update_epsilon.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
+}
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files postmul_resizer.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
+}
 
 
 # Proc to create BD geb_gef_update
@@ -2201,6 +2374,12 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files geb_gef_update.bd ]
 # Create wrapper file for geb_gef_update.bd
 make_wrapper -files [get_files geb_gef_update.bd] -import -top
 
+if { [get_files dsp_pkg.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
+}
+if { [get_files normalize.vhd] == "" } {
+  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
+}
 
 
 # Proc to create BD init_xi
