@@ -35,6 +35,7 @@ proc checkRequiredFiles { origin_dir} {
  "[file normalize "$origin_dir/src/tb/update_gamma_tb.vhd"]"\
  "[file normalize "$origin_dir/src/wave_config/tb_behav_gamma.wcfg"]"\
  "[file normalize "$origin_dir/src/tb/update_epsilon_tb.vhd"]"\
+ "[file normalize "$origin_dir/src/wave_config/tb_behav_epsilon.wcfg"]"\
  "[file normalize "$origin_dir/src/tb/update_kappa_tb.vhd"]"\
  "[file normalize "$origin_dir/src/wave_config/tb_behav_kappa.wcfg"]"\
  "[file normalize "$origin_dir/src/tb/update_xi_tb.vhd"]"\
@@ -162,16 +163,17 @@ set_property -name "simulator.xcelium_version" -value "21.09.002" -objects $obj
 set_property -name "simulator.xsim_gcc_version" -value "6.2.0" -objects $obj
 set_property -name "simulator.xsim_version" -value "2022.1" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
+set_property -name "source_mgmt_mode" -value "DisplayOnly" -objects $obj
 set_property -name "target_language" -value "VHDL" -objects $obj
-set_property -name "webtalk.activehdl_export_sim" -value "54" -objects $obj
+set_property -name "webtalk.activehdl_export_sim" -value "55" -objects $obj
 set_property -name "webtalk.ies_export_sim" -value "30" -objects $obj
-set_property -name "webtalk.modelsim_export_sim" -value "54" -objects $obj
-set_property -name "webtalk.questa_export_sim" -value "54" -objects $obj
-set_property -name "webtalk.riviera_export_sim" -value "54" -objects $obj
-set_property -name "webtalk.vcs_export_sim" -value "54" -objects $obj
-set_property -name "webtalk.xcelium_export_sim" -value "7" -objects $obj
-set_property -name "webtalk.xsim_export_sim" -value "54" -objects $obj
-set_property -name "webtalk.xsim_launch_sim" -value "588" -objects $obj
+set_property -name "webtalk.modelsim_export_sim" -value "55" -objects $obj
+set_property -name "webtalk.questa_export_sim" -value "55" -objects $obj
+set_property -name "webtalk.riviera_export_sim" -value "55" -objects $obj
+set_property -name "webtalk.vcs_export_sim" -value "55" -objects $obj
+set_property -name "webtalk.xcelium_export_sim" -value "8" -objects $obj
+set_property -name "webtalk.xsim_export_sim" -value "55" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "601" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -344,6 +346,7 @@ if {[string equal [get_filesets -quiet test_epsilon_update] ""]} {
 set obj [get_filesets test_epsilon_update]
 set files [list \
  [file normalize "${origin_dir}/src/tb/update_epsilon_tb.vhd"] \
+ [file normalize "${origin_dir}/src/wave_config/tb_behav_epsilon.wcfg"] \
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -555,18 +558,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files divider_test.bd ]
 # Create wrapper file for divider_test.bd
 make_wrapper -files [get_files divider_test.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
 
 
 # Proc to create BD update_xi
@@ -840,42 +831,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_xi.bd ]
 # Create wrapper file for update_xi.bd
 make_wrapper -files [get_files update_xi.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files mux.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files mux.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/mux.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
 
 
 # Proc to create BD update_kappa
@@ -1197,9 +1152,8 @@ proc cr_bd_update_kappa { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_update_kappa()
@@ -1211,12 +1165,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_kappa.bd ]
 # Create wrapper file for update_kappa.bd
 make_wrapper -files [get_files update_kappa.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
 
 
 # Proc to create BD update_gamma
@@ -1407,9 +1355,8 @@ proc cr_bd_update_gamma { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_update_gamma()
@@ -1421,60 +1368,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_gamma.bd ]
 # Create wrapper file for update_gamma.bd
 make_wrapper -files [get_files update_gamma.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files delay.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/delay.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
 
 
 # Proc to create BD update_feedforward
@@ -1836,9 +1729,8 @@ proc cr_bd_update_feedforward { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_update_feedforward()
@@ -1850,30 +1742,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_feedforward.
 # Create wrapper file for update_feedforward.bd
 make_wrapper -files [get_files update_feedforward.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files c_port_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/c_port_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer_wideinput.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer_wideinput.vhd"
-}
 
 
 # Proc to create BD update_epsilon
@@ -2115,9 +1983,8 @@ proc cr_bd_update_epsilon { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_update_epsilon()
@@ -2129,18 +1996,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files update_epsilon.bd ]
 # Create wrapper file for update_epsilon.bd
 make_wrapper -files [get_files update_epsilon.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files postmul_resizer.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/postmul_resizer.vhd"
-}
 
 
 # Proc to create BD geb_gef_update
@@ -2333,9 +2188,8 @@ proc cr_bd_geb_gef_update { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_geb_gef_update()
@@ -2347,12 +2201,6 @@ set_property SYNTH_CHECKPOINT_MODE "Hierarchical" [get_files geb_gef_update.bd ]
 # Create wrapper file for geb_gef_update.bd
 make_wrapper -files [get_files geb_gef_update.bd] -import -top
 
-if { [get_files dsp_pkg.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/dsp_pkg.vhd"
-}
-if { [get_files normalize.vhd] == "" } {
-  import_files -quiet -fileset sources_1 "$origin_dir/src/normalize.vhd"
-}
 
 
 # Proc to create BD init_xi
@@ -2541,9 +2389,8 @@ proc cr_bd_init_xi { parentCell } {
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
-common::send_gid_msg -ssname BD::TCL -id 2050 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
-
   close_bd_design $design_name 
 }
 # End of cr_bd_init_xi()

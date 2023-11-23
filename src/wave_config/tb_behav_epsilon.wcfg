@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="dsp_pkg" />
+            <top_module name="tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="462.796 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,107.441 ns"></ZoomEndTime>
+      <Cursor1Time time="1,000.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="498"></NameColumnWidth>
+      <ValueColumnWidth column_width="242"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="17" />
+   <wvobject fp_name="/tb/ck" type="logic">
+      <obj_property name="ElementShortName">ck</obj_property>
+      <obj_property name="ObjectShortName">ck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/kb" type="array">
+      <obj_property name="ElementShortName">kb[17:0]</obj_property>
+      <obj_property name="ObjectShortName">kb[17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/kf" type="array">
+      <obj_property name="ElementShortName">kf[17:0]</obj_property>
+      <obj_property name="ObjectShortName">kf[17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/eb" type="array">
+      <obj_property name="ElementShortName">eb[17:0]</obj_property>
+      <obj_property name="ObjectShortName">eb[17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/ef" type="array">
+      <obj_property name="ElementShortName">ef[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ef[17:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/eb_out" type="array">
+      <obj_property name="ElementShortName">eb_out[17:0]</obj_property>
+      <obj_property name="ObjectShortName">eb_out[17:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/eb_result" type="array">
+      <obj_property name="ElementShortName">eb_result[32:15]</obj_property>
+      <obj_property name="ObjectShortName">eb_result[32:15]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/ef_out" type="array">
+      <obj_property name="ElementShortName">ef_out[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ef_out[17:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/ef_result" type="array">
+      <obj_property name="ElementShortName">ef_result[32:15]</obj_property>
+      <obj_property name="ObjectShortName">ef_result[32:15]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/kbef" type="array">
+      <obj_property name="ElementShortName">kbef[35:0]</obj_property>
+      <obj_property name="ObjectShortName">kbef[35:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">30</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/kfeb" type="array">
+      <obj_property name="ElementShortName">kfeb[35:0]</obj_property>
+      <obj_property name="ObjectShortName">kfeb[35:0]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">30</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/eb_val" type="array">
+      <obj_property name="ElementShortName">eb_val[0:17]</obj_property>
+      <obj_property name="ObjectShortName">eb_val[0:17]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/ef_val" type="array">
+      <obj_property name="ElementShortName">ef_val[0:17]</obj_property>
+      <obj_property name="ObjectShortName">ef_val[0:17]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/kb_val" type="array">
+      <obj_property name="ElementShortName">kb_val[0:17]</obj_property>
+      <obj_property name="ObjectShortName">kb_val[0:17]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/kf_val" type="array">
+      <obj_property name="ElementShortName">kf_val[0:17]</obj_property>
+      <obj_property name="ObjectShortName">kf_val[0:17]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">15</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/eb_extended" type="array">
+      <obj_property name="ElementShortName">eb_extended[0:35]</obj_property>
+      <obj_property name="ObjectShortName">eb_extended[0:35]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">30</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb/ef_extended" type="array">
+      <obj_property name="ElementShortName">ef_extended[0:35]</obj_property>
+      <obj_property name="ObjectShortName">ef_extended[0:35]</obj_property>
+      <obj_property name="Radix">REALRADIX</obj_property>
+      <obj_property name="radix_realType">SIGNEDFIXEDPOINTRADIX</obj_property>
+      <obj_property name="radix_fractionWidth">30</obj_property>
+      <obj_property name="radix_otherWidth">0</obj_property>
+   </wvobject>
+</wave_config>
