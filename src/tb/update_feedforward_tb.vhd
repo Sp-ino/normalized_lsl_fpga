@@ -39,8 +39,8 @@ architecture behavioral of tb is
 
     constant tck: time := 10ns;
     constant v_val: std_logic_vector := b"001010101010111011";
-    constant eb_val: std_logic_vector := b"000110000000001011";
     constant e_val: std_logic_vector := b"000101010100010111";
+    constant eb_val: std_logic_vector := b"000110000000001011";
     constant e_val_resized: std_logic_vector := b"000000101010100010111000000000000000";
     constant beta_val: std_logic_vector := b"000111111100010111";
 
@@ -48,7 +48,6 @@ architecture behavioral of tb is
     constant e_minus_veb: signed := signed(e_val_resized) - veb;
     constant e_result: std_logic_vector := std_logic_vector(e_minus_veb(frac_len + word_len - 1 downto frac_len));
     constant ys_result: std_logic_vector := std_logic_vector(veb(frac_len + word_len - 1 downto frac_len));
-    
     constant betae_n: signed := signed(beta_val)*signed(e_result)*signed(normalization);
     constant betae_normalized: signed := betae_n(2*frac_len + word_len - 1 downto 2*frac_len);
     constant v_result: std_logic_vector := std_logic_vector(signed(v_val) + betae_normalized);

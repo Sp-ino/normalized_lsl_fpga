@@ -12,6 +12,7 @@ entity update_block is
         ck: in std_logic;
         sel: in std_logic;
         valid: in std_logic;
+
         geb_m: in std_logic_vector (word_len - 1 downto 0);
         gef_m: in std_logic_vector (word_len - 1 downto 0);
         gam_m: in std_logic_vector (word_len - 1 downto 0);
@@ -19,11 +20,16 @@ entity update_block is
         beta_m: in std_logic_vector (word_len - 1 downto 0);
         beta1_m: in std_logic_vector (word_len - 1 downto 0);
         eb1_m: in std_logic_vector (word_len - 1 downto 0);
+        eb_m: in std_logic_vector (word_len - 1 downto 0);
         ef_m: in std_logic_vector (word_len - 1 downto 0);
         Kf1_m: in std_logic_vector (word_len - 1 downto 0);
         Kb1_m: in std_logic_vector (word_len - 1 downto 0);
         xif1_m1: in std_logic_vector (word_len - 1 downto 0);
         xif_m: in std_logic_vector (word_len - 1 downto 0);
+        e_m: in std_logic_vector (word_len - 1 downto 0);
+        v1_m: in std_logic_vector (word_len - 1 downto 0);
+        ys_m: in std_logic_vector (word_len - 1 downto 0);
+
         xib1_m1: in std_logic_vector (word_len - 1 downto 0);
         beta_m1: out std_logic_vector (word_len - 1 downto 0);
         geb_m1: out std_logic_vector (word_len - 1 downto 0);
@@ -34,7 +40,10 @@ entity update_block is
         Kb_m: out std_logic_vector (word_len - 1 downto 0);
         Kf_m: out std_logic_vector (word_len - 1 downto 0);
         xib_m1: out std_logic_vector (word_len - 1 downto 0);
-        xif_m1: out std_logic_vector (word_len - 1 downto 0)
+        xif_m1: out std_logic_vector (word_len - 1 downto 0);
+        e_m1: out std_logic_vector (word_len - 1 downto 0);
+        v_m: out std_logic_vector (word_len - 1 downto 0);
+        ys_m1: out std_logic_vector (word_len - 1 downto 0)
     );
 end update_block; 
 
@@ -157,6 +166,10 @@ architecture structure of update_block is
     signal kf_m_del5: std_logic_vector (word_len - 1 downto 0);
     signal kb_m_del5: std_logic_vector (word_len - 1 downto 0);
     
+    signal v_m_del3: std_logic_vector (word_len - 1 downto 0);
+    signal e_m1_del3: std_logic_vector (word_len - 1 downto 0);
+    signal ys_m1_del3: std_logic_vector (word_len - 1 downto 0);
+    
 begin
 
     u_gam: update_gamma
@@ -245,7 +258,7 @@ begin
         i_data => eb_m1_del1,
         o_data => eb_m1_del2
     );
-    
+
     u_xi: update_xi
     port map (
         ck => ck,
@@ -298,6 +311,21 @@ begin
         Kf_m => Kf_m_del5,
         Kb_m => Kb_m_del5,
         beta_m1 => beta_m1
+    );
+
+
+
+    u_feedforward: update_feedforward
+    port map (
+        ck => ck,
+        v1_m => v1_m,
+        eb_m => eb_m,
+        e_m => e_m,
+        beta_m => beta_m,
+        ys_m => ys_m,
+        e_m1 => e_m1_del3,
+        v_m => v_m_del3,
+        ys_m1 => ys_m1_del3
     );
 
 
@@ -391,5 +419,35 @@ begin
         i_data => xif_m1_del3,
         o_data => xif_m1
     );
+
+    del5_v_m: delay_for_structures
+    generic map (
+        delay_len => 5
+    )
+    port map (
+        i_ck => ck,
+        i_data => v_m_del3,
+        o_data => v_m
+    );
+
+    del5_e_m1: delay_for_structures
+    generic map (
+        delay_len => 5
+    )
+    port map (
+        i_ck => ck,
+        i_data => e_m1_del3,
+        o_data => e_m1
+    );
+
+    del5_ys_m1: delay_for_structures
+    generic map (
+        delay_len => 5
+    )    
+    port map (
+        i_ck => ck,
+        i_data => ys_m1_del3,
+        o_data => ys_m1
+    );    
 
 end structure;
