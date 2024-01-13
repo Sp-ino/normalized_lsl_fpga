@@ -43,7 +43,6 @@ architecture behavioral of tb is
 
     constant kbef: signed := signed(kb_val)*signed(ef_val);
     constant kfeb: signed := signed(kf_val)*signed(eb_val);
-
     constant eb_result_sign: signed := signed(eb_extended) - kbef;
     constant ef_result_sign: signed := signed(ef_extended) - kfeb;
     constant eb_result: std_logic_vector := std_logic_vector(eb_result_sign(frac_len + word_len - 1 downto frac_len));

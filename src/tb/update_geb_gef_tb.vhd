@@ -26,22 +26,21 @@ architecture behavioral of tb is
     end component;
 
     signal ck: std_logic;
-    signal gam: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
+    signal gam_m1: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
     signal eb: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
-    signal gam1: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
+    signal gam1_m1: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
     signal ef: std_logic_vector (word_len - 1 downto 0) := b"000000000000000000";
     signal geb_out: std_logic_vector (word_len - 1 downto 0);
     signal gef_out: std_logic_vector (word_len - 1 downto 0);
 
     constant tck: time := 10ns;
-    constant gam_val: std_logic_vector := b"001010101010111011";
+    constant gam_m1_val: std_logic_vector := b"001010101010111011";
     constant eb_val: std_logic_vector := b"001011111110111011";
-    constant gam1_val: std_logic_vector := b"000110000000001011";
+    constant gam1_m1_val: std_logic_vector := b"000110000000001011";
     constant ef_val: std_logic_vector := b"000101010100010111";
 
-    constant geb_m1: signed := signed(gam_val)*signed(eb_val);
-    constant gef_m1: signed := signed(gam1_val)*signed(ef_val);
-
+    constant geb_m1: signed := signed(gam_m1_val)*signed(eb_val);
+    constant gef_m1: signed := signed(gam1_m1_val)*signed(ef_val);
     constant geb_result: std_logic_vector := std_logic_vector(geb_m1(frac_len + word_len - 1 downto frac_len));
     constant gef_result: std_logic_vector := std_logic_vector(gef_m1(frac_len + word_len - 1 downto frac_len));
 
@@ -50,9 +49,9 @@ begin
     dut: update_geb_gef
     port map (
         ck => ck,
-        gam_m1 => gam,
+        gam_m1 => gam_m1,
         eb_m1 => eb,
-        gam1_m1 => gam1,
+        gam1_m1 => gam1_m1,
         ef_m1 => ef,
         geb_m1 => geb_out,
         gef_m1 => gef_out
@@ -75,8 +74,8 @@ begin
         wait for tck/2;
         eb <= eb_val;
         ef <= ef_val;
-        gam <= gam_val;
-        gam1 <= gam1_val;
+        gam_m1 <= gam_m1_val;
+        gam1_m1 <= gam1_m1_val;
         
         wait for tck;
 

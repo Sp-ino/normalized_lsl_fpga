@@ -15,8 +15,8 @@ package dsp_pkg is
     constant filter_len: integer := 3;
     constant one: std_logic_vector (word_len - 1 downto 0) := "001000000000000000";
     constant one_over_epsilon: std_logic_vector (word_len - 1 downto 0) := "001000000000000000";
-    constant lambda: std_logic_vector (word_len - 1 downto 0) := "000111111111000000";
-    constant normalization: std_logic_vector (word_len - 1 downto 0) := "000000010000000000";
+    constant lambda: std_logic_vector (word_len - 1 downto 0) := "000111111111000000"; -- lambda = 1 - 2**-9
+    constant normalization: std_logic_vector (word_len - 1 downto 0) := "000000010000000000"; -- normalization = 2**-9
 
     type inout_array is array (filter_len - 1 downto 0) of std_logic_vector (word_len - 1 downto 0);
     type filter_array is array (filter_len downto 0) of std_logic_vector (word_len - 1 downto 0);

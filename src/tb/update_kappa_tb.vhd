@@ -107,6 +107,9 @@ begin
 
         wait for tck/2;
         sel <= '0';
+        valid <= '0';
+        
+        wait for 9*tck;
         valid <= '1';
         kb <= kb_val;
         kf <= kf_val;
